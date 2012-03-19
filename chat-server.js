@@ -19,6 +19,13 @@ var history = [ ];
 // list of currently connected clients (users)
 var clients = [ ];
 
+/**
+ * Helper function for escaping input strings
+ */
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 // Array with some colors
 var colors = [ 'red', 'green', 'blue', 'magenta', 'purple', 'plum', 'orange' ];
 // ... in random order
@@ -68,7 +75,7 @@ wsServer.on('request', function(request) {
         if (message.type === 'utf8') { // accept only text
             if (userName === false) { // first message sent by user is their name
                 // remember user name
-                userName = message.utf8Data;
+                userName = htmlEntities(message.utf8Data);
                 // get random color and send it back to the user
                 userColor = colors.shift();
                 connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
@@ -82,7 +89,7 @@ wsServer.on('request', function(request) {
                 // we want to keep history of all sent messages
                 var obj = {
                     time: (new Date()).getTime(),
-                    text: message.utf8Data,
+                    text: htmlEntities(message.utf8Data),
                     author: userName,
                     color: userColor
                 };
