@@ -14,7 +14,7 @@ var http = require('http');
 /**
  * Global variables
  */
-// entire message history
+// latest 100 messages
 var history = [ ];
 // list of currently connected clients (users)
 var clients = [ ];
@@ -95,6 +95,7 @@ wsServer.on('request', function(request) {
                     color: userColor
                 };
                 history.push(obj);
+                history.slice(-100);
 
                 // broadcast message to all connected clients
                 var json = JSON.stringify({ type:'message', data: obj });
