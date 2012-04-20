@@ -95,7 +95,7 @@ wsServer.on('request', function(request) {
                     color: userColor
                 };
                 history.push(obj);
-                history.slice(-100);
+                history = history.slice(-100);
 
                 // broadcast message to all connected clients
                 var json = JSON.stringify({ type:'message', data: obj });
