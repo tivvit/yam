@@ -35,7 +35,7 @@ $(function () {
     connection.onerror = function (error) {
         // just in there were some problems with conenction...
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
-                                    + 'connection or the server is down.</p>' } ));
+                                    + 'connection or the server is down.' } ));
     };
 
     // most important part - incoming messages
