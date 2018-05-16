@@ -1,0 +1,31 @@
+$radius: .4em;
+
+body {
+  padding: 0;
+}
+
+#input {
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  padding: 5px;
+  width: 400px;
+}
+
+.messages {
+  .message {
+    padding: .2em .6em;
+    background: lightgray;
+    border-radius: $radius;
+    margin-bottom: .1em;
+  }
+}
+
+#controls {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  border-top: solid 4px dodgerblue;
+  padding-bottom: 1em;
+}

@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>WebSockets - Simple chat</title>
+<head>
+    <meta charset="utf-8">
+    <title>YAM</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="content">
+    <div class="messages">
+            <div class="message">Hi</div>
+            <div class="message">how are you</div>
+            <div class="message">u here?</div>
+    </div>
+</div>
+<div id="controls">
+    <input type="text" id="input"/>
+    <input type="submit" id="send"/>
+</div>
 
-        <style>
-        * { font-family:tahoma; font-size:12px; padding:0px; margin:0px; }
-        p { line-height:18px; }
-        div { width:500px; margin-left:auto; margin-right:auto;}
-        #content { padding:5px; background:#ddd; border-radius:5px; overflow-y: scroll;
-                   border:1px solid #CCC; margin-top:10px; height: 160px; }
-        #input { border-radius:2px; border:1px solid #ccc;
-                 margin-top:10px; padding:5px; width:400px;  }
-        #status { width:88px; display:block; float:left; margin-top:15px; }
-        </style>
-    </head>
-    <body>
-        <div id="content"></div>
-        <div>
-            <span id="status">Connecting...</span>
-            <input type="text" id="input" disabled="disabled" />
-        </div>
-
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script src="./frontend.js"></script>
-    </body>
+<script crossorigin src="https://unpkg.com/react@15/dist/react.js"></script>
+<script crossorigin
+        src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+<script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+<script src="chat-frontend.js"></script>
+<script crossorigin type="text/babel" src="chat.js"></script>
+</body>
 </html>
