@@ -1,3 +1,17 @@
+function offline() {
+    var elem = document.getElementById("statusMessage");
+    elem.textContent = "offline";
+    elem.classList.remove('online');
+    elem.classList.add('offline');
+}
+
+function online() {
+    var elem = document.getElementById("statusMessage");
+    elem.textContent = "online";
+    elem.classList.remove('offline');
+    elem.classList.add('online');
+}
+
 var App = React.createClass({
     getInitialState: function () {
         return (
@@ -10,10 +24,7 @@ var App = React.createClass({
         )
     },
 
-    componentDidMount: function () {
-        var content = document.getElementById("content");
-        var input = document.getElementById('input');
-
+    connect: function() {
         // if user is running mozilla then use it's built-in WebSocket
         window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -27,9 +38,62 @@ var App = React.createClass({
             // return;
         }
 
-
         // open connection
         this.connection = new WebSocket('ws://127.0.0.1:1337');
+
+        this.connection.onopen = function () {
+            online()
+        };
+
+        this.connection.onerror = function (error) {
+            // just in there were some problems with conenction...
+            offline();
+            // todo disable input
+            // content.html($('<p>', {
+            //     text: 'Sorry, but there\'s some problem with your '
+            //     + 'connection or the server is down.'
+            // }));
+        };
+
+        this.connection.onmessage = (message) => {
+            // try to parse JSON message. Because we know that the server always returns
+            // JSON this should work without any problem but we should make sure that
+            // the massage is not chunked or otherwise damaged.
+            try {
+                var json = JSON.parse(message.data);
+            } catch (e) {
+                console.log('This doesn\'t look like a valid JSON: ', message.data);
+                // return;
+            }
+
+            console.log("data");
+
+            if (json.type === 'history') { // entire message history
+                // insert every single message to the chat window
+                for (var i = 0; i < json.data.length; i++) {
+                    this.addFruit(json.data[i].text)
+                    // addMessage(json.data[i].author, json.data[i].text,
+                    //     json.data[i].color, new Date(json.data[i].time));
+                }
+                content.scrollTo(0, content.scrollHeight);
+            } else if (json.type === 'message') { // it's a single message
+                // input.removeAttr('disabled'); // let the user write another message
+                this.addFruit(json.data.text);
+                // this.setState({fruits: ["aaa"]});
+                // addMessage(json.data.author, json.data.text,
+                //     json.data.color, new Date(json.data.time));
+                content.scrollTo(0, content.scrollHeight);
+            } else {
+                console.log('Hmm..., I\'ve never seen JSON like this: ', json);
+            }
+        };
+    },
+
+    componentDidMount: function () {
+        var content = document.getElementById("content");
+        var input = document.getElementById('input');
+
+        this.connect();
 
         input.addEventListener('keydown', function(event) {
           if (event.keyCode === 13) {
@@ -59,67 +123,19 @@ var App = React.createClass({
          * in 3 seconds then show some error message to notify the user that
          * something is wrong.
          */
+
+        // todo chage to react component
+        // todo reconnect on offline (serviceworker?)
         setInterval(function () {
             if (this.connection.readyState !== 1) {
-                // status.text('Error');
-                input.attr('disabled', 'disabled').val('Unable to comminucate '
-                    + 'with the WebSocket server.');
-            }
-        }.bind(this), 3000);
-
-        this.connection.onopen = function () {
-            // first we want users to enter their names
-            // input.removeAttr('disabled');
-            // status.text('Choose name:');
-        };
-
-        this.connection.onerror = function (error) {
-            // just in there were some problems with conenction...
-            content.html($('<p>', {
-                text: 'Sorry, but there\'s some problem with your '
-                + 'connection or the server is down.'
-            }));
-        };
-
-        this.connection.onmessage = (message) => {
-            // try to parse JSON message. Because we know that the server always returns
-            // JSON this should work without any problem but we should make sure that
-            // the massage is not chunked or otherwise damaged.
-            try {
-                var json = JSON.parse(message.data);
-            } catch (e) {
-                console.log('This doesn\'t look like a valid JSON: ', message.data);
-                // return;
-            }
-
-
-            // NOTE: if you're not sure about the JSON structure
-            // check the server source code above
-            if (json.type === 'color') { // first response from the server with user's color
-                // myColor = json.data;
-                // status.innerHTML += myName + ': ';
-                // .css('color', myColor);
-                // input.removeAttr('disabled').focus();
-                // from now user can start sending messages
-            } else if (json.type === 'history') { // entire message history
-                // insert every single message to the chat window
-                for (var i = 0; i < json.data.length; i++) {
-                    this.addFruit(json.data[i].text)
-                    // addMessage(json.data[i].author, json.data[i].text,
-                    //     json.data[i].color, new Date(json.data[i].time));
-                }
-                content.scrollTo(0, content.scrollHeight);
-            } else if (json.type === 'message') { // it's a single message
-                // input.removeAttr('disabled'); // let the user write another message
-                this.addFruit(json.data.text);
-                // this.setState({fruits: ["aaa"]});
-                // addMessage(json.data.author, json.data.text,
-                //     json.data.color, new Date(json.data.time));
-                content.scrollTo(0, content.scrollHeight);
+                offline();
+                this.connect();
             } else {
-                console.log('Hmm..., I\'ve never seen JSON like this: ', json);
+                online();
             }
-        };
+        }.bind(this), 1000);
+
+
 
         // this is an "echo" websocket service for testing pusposes
         // this.connection = new WebSocket('wss://echo.websocket.org');
