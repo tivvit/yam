@@ -52,6 +52,8 @@ var App = React.createClass({
                 // return;
             }
 
+            var content = document.getElementById("content");
+
             // NOTE: if you're not sure about the JSON structure
             // check the server source code above
             if (json.type === 'color') { // first response from the server with user's color
@@ -67,12 +69,14 @@ var App = React.createClass({
                     // addMessage(json.data[i].author, json.data[i].text,
                     //     json.data[i].color, new Date(json.data[i].time));
                 }
+                content.scrollTo(0, content.scrollHeight);
             } else if (json.type === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
-                this.addFruit(json.data.text)
+                this.addFruit(json.data.text);
                 // this.setState({fruits: ["aaa"]});
                 // addMessage(json.data.author, json.data.text,
                 //     json.data.color, new Date(json.data.time));
+                content.scrollTo(0, content.scrollHeight);
             } else {
                 console.log('Hmm..., I\'ve never seen JSON like this: ', json);
             }

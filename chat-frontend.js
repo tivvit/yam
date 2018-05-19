@@ -78,9 +78,9 @@ connection.onerror = function (error) {
 input.addEventListener('keydown', function(event) {
   if (event.keyCode === 13) {
         var msg = event.target.value;
-        // if (!msg) {
-        //     return;
-        // }
+        if (!msg) {
+            return;
+        }
         // send the message as an ordinary text
         connection.send(msg);
         event.target.value = "";
@@ -92,6 +92,7 @@ input.addEventListener('keydown', function(event) {
         if (myName === false) {
             myName = msg;
         }
+
     }
 });
 
