@@ -11,9 +11,21 @@ body {
 }
 
 #menu {
-  padding: .2em .8em .2em .2em;
-  border-right: 2px solid red;
+  padding: .2em .4em .2em .2em;
+  border-right: 4px solid dodgerblue;
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  #users {
+    overflow-y: scroll;
+    flex: 10 1 auto;
+  }
+
+  #status {
+    border-top: 1px solid #ccc;
+    flex: 0 0 auto;
+  }
 }
 
 #chat {

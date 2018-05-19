@@ -7,9 +7,17 @@ body {
   width: 100%; }
 
 #menu {
-  padding: .2em .8em .2em .2em;
-  border-right: 2px solid red;
-  flex: 0 0 auto; }
+  padding: .2em .4em .2em .2em;
+  border-right: 4px solid dodgerblue;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column; }
+  #menu #users {
+    overflow-y: scroll;
+    flex: 10 1 auto; }
+  #menu #status {
+    border-top: 1px solid #ccc;
+    flex: 0 0 auto; }
 
 #chat {
   flex-direction: column;
