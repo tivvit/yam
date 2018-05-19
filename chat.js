@@ -66,19 +66,17 @@ var App = React.createClass({
                 // return;
             }
 
-            console.log("data");
-
-            if (json.type === 'history') { // entire message history
+            if (json.action === 'history') { // entire message history
                 // insert every single message to the chat window
-                for (var i = 0; i < json.data.length; i++) {
-                    this.addFruit(json.data[i].text)
+                for (var i = 0; i < json.messages.length; i++) {
+                    this.addMessage(json.messages[i].text)
                     // addMessage(json.data[i].author, json.data[i].text,
                     //     json.data[i].color, new Date(json.data[i].time));
                 }
                 content.scrollTo(0, content.scrollHeight);
-            } else if (json.type === 'message') { // it's a single message
+            } else if (json.action === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
-                this.addFruit(json.data.text);
+                this.addMessage(json.text);
                 // this.setState({fruits: ["aaa"]});
                 // addMessage(json.data.author, json.data.text,
                 //     json.data.color, new Date(json.data.time));
@@ -148,7 +146,7 @@ var App = React.createClass({
         // };
     },
 
-    addFruit: function (fruit) {
+    addMessage: function (fruit) {
         //create a unike key for each new fruit item
         var timestamp = (new Date()).getTime();
         // update the state object
@@ -200,10 +198,10 @@ ReactDOM.render(
 //         // send the message as an ordinary text
 //         connection.send(msg);
 //
-//         this.props.addFruit(fruit);
+//         this.props.addMessage(fruit);
 //         //reset the form
 //         // this.refs.fruitForm.reset();
-//         // App.addFruit(msg);
+//         // App.addMessage(msg);
 //         event.srcElement.value = "";
 //         // disable the input field to make the user wait until server
 //         // sends back response
