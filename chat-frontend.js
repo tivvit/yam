@@ -77,13 +77,16 @@ connection.onerror = function (error) {
  */
 input.addEventListener('keydown', function(event) {
   if (event.keyCode === 13) {
-        var msg = event.target.value;
+        event.preventDefault();
+        // var msg = event.target.value; // for input
+        var msg = event.target.textContent;
         if (!msg) {
             return;
         }
         // send the message as an ordinary text
         connection.send(msg);
-        event.target.value = "";
+        // event.target.value = "";
+        event.target.textContent = "";
         // disable the input field to make the user wait until server
         // sends back response
         // input.attr('disabled', 'disabled');
@@ -92,7 +95,6 @@ input.addEventListener('keydown', function(event) {
         if (myName === false) {
             myName = msg;
         }
-
     }
 });
 
