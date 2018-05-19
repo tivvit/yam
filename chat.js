@@ -11,21 +11,61 @@ var App = React.createClass({
     },
 
     componentDidMount: function () {
+        var content = document.getElementById("content");
+        var input = document.getElementById('input');
+
+        // if user is running mozilla then use it's built-in WebSocket
         window.WebSocket = window.WebSocket || window.MozWebSocket;
 
         // if browser doesn't support WebSocket, just show some notification and exit
-        // if (!window.WebSocket) {
-        //     content.html($('<p>', {
-        //         text: 'Sorry, but your browser doesn\'t '
-        //         + 'support WebSockets.'
-        //     }));
-        //     input.hide();
-        //     $('span').hide();
-        //     // return;
-        // }
+        if (!window.WebSocket) {
+            content.textContent = 'Sorry, but your browser' +
+                ' doesn\'t '
+                                        + 'support WebSockets.';
+            // input.hide();
+            // $('span').hide();
+            // return;
+        }
+
 
         // open connection
         this.connection = new WebSocket('ws://127.0.0.1:1337');
+
+        input.addEventListener('keydown', function(event) {
+          if (event.keyCode === 13) {
+                event.preventDefault();
+                // var msg = event.target.value; // for input
+                var msg = event.target.textContent;
+                if (!msg) {
+                    return;
+                }
+                // send the message as an ordinary text
+                this.connection.send(msg);
+                // event.target.value = "";
+                event.target.textContent = "";
+                // disable the input field to make the user wait until server
+                // sends back response
+                // input.attr('disabled', 'disabled');
+
+                // we know that the first message sent from a user their name
+                // if (myName === false) {
+                //     myName = msg;
+                // }
+            }
+        }.bind(this));
+
+        /**
+         * This method is optional. If the server wasn't able to respond to the
+         * in 3 seconds then show some error message to notify the user that
+         * something is wrong.
+         */
+        setInterval(function () {
+            if (this.connection.readyState !== 1) {
+                // status.text('Error');
+                input.attr('disabled', 'disabled').val('Unable to comminucate '
+                    + 'with the WebSocket server.');
+            }
+        }.bind(this), 3000);
 
         this.connection.onopen = function () {
             // first we want users to enter their names
@@ -52,12 +92,11 @@ var App = React.createClass({
                 // return;
             }
 
-            var content = document.getElementById("content");
 
             // NOTE: if you're not sure about the JSON structure
             // check the server source code above
             if (json.type === 'color') { // first response from the server with user's color
-                myColor = json.data;
+                // myColor = json.data;
                 // status.innerHTML += myName + ': ';
                 // .css('color', myColor);
                 // input.removeAttr('disabled').focus();
