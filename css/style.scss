@@ -2,6 +2,27 @@ $radius: .4em;
 
 body {
   padding: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  //flex-direction: column;
+  position: absolute;
+  width: 100%;
+}
+
+#menu {
+  padding: .2em .8em .2em .2em;
+  border-right: 2px solid red;
+  flex: 0 0 auto;
+}
+
+#chat {
+  //position: absolute;
+  //height: 100%;
+  //flex: 1 1 auto;
+  flex-direction: column;
+  display: flex;
+  width: 100%;
 }
 
 #input {
@@ -22,10 +43,20 @@ body {
 }
 
 #controls {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  left: 0;
+  //position: fixed;
+  //bottom: 0;
+  //width: 100%;
+  //left: 0;
   border-top: solid 4px dodgerblue;
   padding-bottom: 1em;
+  //height: 100%;
+  flex: 1 0 content;
+}
+
+#content {
+  //overflow: scroll;
+  //padding-bottom: 60px;
+  overflow-y: scroll;
+  flex: 10 1 auto;
+  padding: .2em;
 }

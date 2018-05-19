@@ -77,13 +77,13 @@ connection.onerror = function (error) {
  */
 input.addEventListener('keydown', function(event) {
   if (event.keyCode === 13) {
-        var msg = event.srcElement.value;
+        var msg = event.target.value;
         // if (!msg) {
         //     return;
         // }
         // send the message as an ordinary text
         connection.send(msg);
-        event.srcElement.value = "";
+        event.target.value = "";
         // disable the input field to make the user wait until server
         // sends back response
         // input.attr('disabled', 'disabled');
