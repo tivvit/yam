@@ -31,8 +31,17 @@ body {
 
 #controls {
   border-top: solid 4px dodgerblue;
-  padding-bottom: 1em;
-  flex: 1 0 content; }
+  flex: 0 0 auto;
+  display: flex; }
+  #controls #input {
+    flex: 1 1 0;
+    margin: .4em;
+    min-height: 1em; }
+  #controls #send {
+    background-color: darkseagreen;
+    flex: 0 0 content;
+    padding: .4em;
+    cursor: pointer; }
 
 #content {
   overflow-y: scroll;
