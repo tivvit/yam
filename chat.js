@@ -16,7 +16,7 @@ var App = React.createClass({
     getInitialState: function () {
         return (
             {
-                fruits: {
+                messages: {
                     // 'fruit-1': 'orange',
                     // 'fruit-2': 'apple'
                 }
@@ -24,7 +24,7 @@ var App = React.createClass({
         )
     },
 
-    connect: function() {
+    connect: function () {
         // if user is running mozilla then use it's built-in WebSocket
         window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -32,7 +32,7 @@ var App = React.createClass({
         if (!window.WebSocket) {
             content.textContent = 'Sorry, but your browser' +
                 ' doesn\'t '
-                                        + 'support WebSockets.';
+                + 'support WebSockets.';
             // input.hide();
             // $('span').hide();
             // return;
@@ -42,8 +42,11 @@ var App = React.createClass({
         this.connection = new WebSocket('ws://127.0.0.1:1337');
 
         this.connection.onopen = function () {
-            online()
-        };
+            online();
+            this.connection.send(JSON.stringify({
+                "op": "history",
+            }))
+        }.bind(this);
 
         this.connection.onerror = function (error) {
             // just in there were some problems with conenction...
@@ -68,16 +71,19 @@ var App = React.createClass({
 
             if (json.action === 'history') { // entire message history
                 // insert every single message to the chat window
-                for (var i = 0; i < json.messages.length; i++) {
-                    this.addMessage(json.messages[i].text)
-                    // addMessage(json.data[i].author, json.data[i].text,
-                    //     json.data[i].color, new Date(json.data[i].time));
+                this.setState({messages: []});
+                if (json.messages !== null) {
+                    for (var i = 0; i <= json.messages.length; i++) {
+                        this.addMessage(json.messages[i].text)
+                        // addMessage(json.data[i].author, json.data[i].text,
+                        //     json.data[i].color, new Date(json.data[i].time));
+                    }
                 }
                 content.scrollTo(0, content.scrollHeight);
             } else if (json.action === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
                 this.addMessage(json.text);
-                // this.setState({fruits: ["aaa"]});
+                // this.setState({messages: ["aaa"]});
                 // addMessage(json.data.author, json.data.text,
                 //     json.data.color, new Date(json.data.time));
                 content.scrollTo(0, content.scrollHeight);
@@ -93,16 +99,20 @@ var App = React.createClass({
 
         this.connect();
 
-        input.addEventListener('keydown', function(event) {
-          if (event.keyCode === 13) {
+        input.addEventListener('keydown', function (event) {
+            if (event.keyCode === 13) {
                 event.preventDefault();
                 // var msg = event.target.value; // for input
                 var msg = event.target.textContent;
                 if (!msg) {
                     return;
                 }
-                // send the message as an ordinary text
-                this.connection.send(msg);
+                this.connection.send(JSON.stringify({
+                    "op": "m",
+                    "author": "tivvit",
+                    "text": msg,
+                    // "sent": "" // todo time now
+                }));
                 // event.target.value = "";
                 event.target.textContent = "";
                 // disable the input field to make the user wait until server
@@ -134,7 +144,6 @@ var App = React.createClass({
         }.bind(this), 1000);
 
 
-
         // this is an "echo" websocket service for testing pusposes
         // this.connection = new WebSocket('wss://echo.websocket.org');
         // // listen to onmessage event
@@ -150,15 +159,15 @@ var App = React.createClass({
         //create a unike key for each new fruit item
         var timestamp = (new Date()).getTime();
         // update the state object
-        this.state.fruits['fruit-' + timestamp] = fruit;
+        this.state.messages['message-' + timestamp] = fruit;
         // set the state
-        this.setState({fruits: this.state.fruits});
+        this.setState({messages: this.state.messages});
     },
 
     render: function () {
         return (
             <div className="component-wrapper">
-                <FruitList fruits={this.state.fruits}/>
+                <FruitList messages={this.state.messages}/>
             </div>
         );
     }
@@ -169,10 +178,10 @@ var FruitList = React.createClass({
         return (
             <div className="container messages">
                 {
-                    Object.keys(this.props.fruits).map(function (key) {
+                    Object.keys(this.props.messages).map(function (key) {
                         return <div
                             className="list-group-item list-group-item-info message"
-                            key={key}>{this.props.fruits[key]}</div>
+                            key={key}>{this.props.messages[key]}</div>
                     }.bind(this))
                 }
             </div>
