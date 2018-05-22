@@ -16,10 +16,7 @@ var App = React.createClass({
     getInitialState: function () {
         return (
             {
-                messages: {
-                    // 'fruit-1': 'orange',
-                    // 'fruit-2': 'apple'
-                }
+                messages: []
             }
         )
     },
@@ -73,8 +70,9 @@ var App = React.createClass({
                 // insert every single message to the chat window
                 this.setState({messages: []});
                 if (json.messages !== null) {
-                    for (var i = 0; i <= json.messages.length; i++) {
-                        this.addMessage(json.messages[i].text)
+                    for (var i = 0; i < json.messages.length; i++) {
+                        this.addMessage(json.messages[i]);
+                        // console.log(json.messages[i])
                         // addMessage(json.data[i].author, json.data[i].text,
                         //     json.data[i].color, new Date(json.data[i].time));
                     }
@@ -82,7 +80,7 @@ var App = React.createClass({
                 content.scrollTo(0, content.scrollHeight);
             } else if (json.action === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
-                this.addMessage(json.text);
+                this.addMessage(json);
                 // this.setState({messages: ["aaa"]});
                 // addMessage(json.data.author, json.data.text,
                 //     json.data.color, new Date(json.data.time));
@@ -155,11 +153,11 @@ var App = React.createClass({
         // };
     },
 
-    addMessage: function (fruit) {
+    addMessage: function (message) {
         //create a unike key for each new fruit item
         var timestamp = (new Date()).getTime();
         // update the state object
-        this.state.messages['message-' + timestamp] = fruit;
+        this.state.messages['message-' + timestamp] = message;
         // set the state
         this.setState({messages: this.state.messages});
     },
@@ -167,21 +165,23 @@ var App = React.createClass({
     render: function () {
         return (
             <div className="component-wrapper">
-                <FruitList messages={this.state.messages}/>
+                <Messages messages={this.state.messages}/>
             </div>
         );
     }
 });
 
-var FruitList = React.createClass({
+let Messages = React.createClass({
     render: function () {
+        if (this.props.messages === null || this.props.messages === undefined) {
+            return null
+        }
         return (
             <div className="container messages">
                 {
                     Object.keys(this.props.messages).map(function (key) {
-                        return <div
-                            className="list-group-item list-group-item-info message"
-                            key={key}>{this.props.messages[key]}</div>
+                        return <Message key={key} id={key}
+                                        value={this.props.messages[key]}/>
                     }.bind(this))
                 }
             </div>
@@ -189,6 +189,21 @@ var FruitList = React.createClass({
     }
 });
 
+let Message = React.createClass({
+    render: function () {
+        return (
+            <div className="message-wrap">
+                <div className="message" key={this.props.id}>
+                    {this.props.value.text}
+                </div>
+                <div className="nested">
+                    {/* todo do not create nested is not nested*/}
+                    <Messages  messages={this.props.value.children}/>
+                </div>
+            </div>
+        )
+    }
+});
 
 ReactDOM.render(
     <App/>,

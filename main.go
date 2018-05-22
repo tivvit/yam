@@ -52,6 +52,73 @@ type History struct {
 	Messages []Message `json:"messages"`
 }
 
+
+func fakeMesages() []Message {
+	return []Message{
+		{
+			Text: "Hi",
+			Children: []Message{
+				{
+					Text: "Hello",
+				},
+			},
+		},
+		{
+			Text: "I wanted to ask",
+			Children: []Message{
+				{
+					Text: "About?",
+				},
+				{
+					Text: "The project",
+				},
+				{
+					Text: "Which one?",
+				},
+				{
+					Text: "The Main one",
+					Children: []Message{
+						{
+							Text: "What do you want to know?",
+						},
+						{
+							Text: "Is the design ready?",
+						},
+						{
+							Text: "Yes",
+						},
+					},
+				},
+				{
+					Text: "Oh and about the second too",
+					Children: []Message{
+						{
+							Text: "Which one is it?",
+						},
+						{
+							Text: "The secret one",
+						},
+						{
+							Text: "I nee to know if you told to Phillip",
+						},
+						{
+							Text: "I definitely did not",
+						},
+					},
+				},
+			},
+		},
+		{
+			Text: "Bye",
+			Children: []Message{
+				{
+					Text: "Bye and thx",
+				},
+			},
+		},
+	}
+}
+
 var storage []Message
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -118,6 +185,7 @@ func processMessage(message []byte) *Message {
 }
 
 func main() {
+	storage = fakeMesages()
 	flag.Parse()
 	log.SetFlags(0)
 	http.HandleFunc("/", handler)

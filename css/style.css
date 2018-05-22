@@ -37,6 +37,10 @@ body {
   border-radius: 0.4em;
   margin-bottom: .1em; }
 
+.nested {
+  padding-left: 1em;
+}
+
 #controls {
   border-top: solid 4px dodgerblue;
   flex: 0 0 auto;

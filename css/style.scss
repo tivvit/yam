@@ -52,6 +52,10 @@ body {
     border-radius: $radius;
     margin-bottom: .1em;
   }
+
+  .nested {
+    padding-left: 1em;
+  }
 }
 
 #controls {
