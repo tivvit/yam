@@ -46,6 +46,10 @@ body {
 }
 
 .messages {
+  .active {
+    background-color: dodgerblue !important;
+  }
+
   .message {
     padding: .2em .6em;
     background: lightgray;

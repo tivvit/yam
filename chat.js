@@ -16,9 +16,21 @@ var App = React.createClass({
     getInitialState: function () {
         return (
             {
-                messages: []
+                messages: [],
+                children: [],
+                sorted: [],
+                parent: null,
             }
         )
+    },
+
+    handleClick: function (e) {
+        this.setState({parent: e.target.dataset.id});
+        if (this.state.parent !== null) {
+            document.getElementById(this.state.parent).classList.toggle("active")
+        }
+        e.target.classList.toggle("active");
+        document.getElementById("input").focus();
     },
 
     connect: function () {
@@ -68,7 +80,11 @@ var App = React.createClass({
 
             if (json.action === 'history') { // entire message history
                 // insert every single message to the chat window
-                this.setState({messages: []});
+                this.setState({
+                    messages: [],
+                    children: [],
+                    sorted: []
+                });
                 if (json.messages !== null) {
                     for (var i = 0; i < json.messages.length; i++) {
                         this.addMessage(json.messages[i]);
@@ -77,13 +93,24 @@ var App = React.createClass({
                         //     json.data[i].color, new Date(json.data[i].time));
                     }
                 }
+                // this.props.sortBy("text");
+                // console.log(this.state.messages.items.sort((a, b) => a.text > b.text));
+                // console.log(this.state.messages.sort(function (a, b) {
+                //     return a.localeCompare(b);
+                //     // if (a.text < b.text) {
+                //     //     return -1;
+                //     // }
+                //     // if (a.text > b.text) {
+                //     //     return 1;
+                //     // }
+                //     // return 0;
+                // }));
+                // console.log(this.state.messages);
+                this.setState({messages: this.state.messages});
                 content.scrollTo(0, content.scrollHeight);
             } else if (json.action === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
                 this.addMessage(json);
-                // this.setState({messages: ["aaa"]});
-                // addMessage(json.data.author, json.data.text,
-                //     json.data.color, new Date(json.data.time));
                 content.scrollTo(0, content.scrollHeight);
             } else {
                 console.log('Hmm..., I\'ve never seen JSON like this: ', json);
@@ -109,18 +136,16 @@ var App = React.createClass({
                     "op": "m",
                     "author": "tivvit",
                     "text": msg,
-                    // "sent": "" // todo time now
+                    // "sent": (new Date()).getTime(),
+                    "parent": this.state.parent,
+                    // "parent": "0e67bbc3-4329-42a0-845a-9fdd4e5ae65d",
+                    // "parent": "c1a861bc-2c01-4777-909a-97bd57dbe80d",
                 }));
                 // event.target.value = "";
                 event.target.textContent = "";
                 // disable the input field to make the user wait until server
                 // sends back response
                 // input.attr('disabled', 'disabled');
-
-                // we know that the first message sent from a user their name
-                // if (myName === false) {
-                //     myName = msg;
-                // }
             }
         }.bind(this));
 
@@ -155,9 +180,19 @@ var App = React.createClass({
 
     addMessage: function (message) {
         //create a unike key for each new fruit item
-        var timestamp = (new Date()).getTime();
+        // var timestamp = (new Date()).getTime();
         // update the state object
-        this.state.messages['message-' + timestamp] = message;
+        if (message.children === undefined) {
+            message.children = [];
+            this.state.children[message.id] = message.children
+        }
+        if (message.parent !== undefined) {
+            this.state.children[message.parent].push(message)
+        } else {
+            this.state.messages[message.id] = message;
+            recurseChildren.bind(this)(message);
+            this.state.sorted.push(message);
+        }
         // set the state
         this.setState({messages: this.state.messages});
     },
@@ -165,23 +200,51 @@ var App = React.createClass({
     render: function () {
         return (
             <div className="component-wrapper">
-                <Messages messages={this.state.messages}/>
+                <Messages messages={this.state.messages}
+                          sorted={this.state.sorted}
+                          onClick={this.handleClick}
+                />
             </div>
         );
     }
 });
 
+function recurseChildren(message) {
+    if (message.children !== undefined) {
+        this.state.children[message.id] = message.children;
+        message.children.forEach(function (m) {
+            recurseChildren.bind(this)(m)
+        }.bind(this));
+    }
+}
+
 let Messages = React.createClass({
     render: function () {
-        if (this.props.messages === null || this.props.messages === undefined) {
+        if (this.props.sorted === null || this.props.sorted === undefined) {
             return null
         }
+        this.props.sorted.sort(function (a, b) {
+            return a.text.localeCompare(b.text);
+        });
         return (
             <div className="container messages">
                 {
-                    Object.keys(this.props.messages).map(function (key) {
-                        return <Message key={key} id={key}
-                                        value={this.props.messages[key]}/>
+                    // console.log(Object.keys(this.props.messages).map(function (key) {
+                    //     // console.log(key);
+                    //    return <Message key={this.props.messages[key].id}
+                    //                     id="ahoj"
+                    //                     // value={this.props.messages[key]}
+                    //                     value={{"text":"test"}}
+                    //    />
+                    // }.bind(this)))
+
+                    this.props.sorted.map(function (m) {
+                        // console.log(this.props.onClick);
+                        return <Message key={m.id}
+                                        id={m.id}
+                                        value={m}
+                                        onClick={this.props.onClick}
+                        />
                     }.bind(this))
                 }
             </div>
@@ -192,13 +255,23 @@ let Messages = React.createClass({
 let Message = React.createClass({
     render: function () {
         return (
-            <div className="message-wrap">
-                <div className="message" key={this.props.id}>
+            <div className="message-wrap"
+                 key={this.props.id}
+            >
+                <div
+                    className="message"
+                    id={this.props.id}
+                    data-id={this.props.id}
+                    onClick={(e) => this.props.onClick(e)}
+                >
                     {this.props.value.text}
                 </div>
                 <div className="nested">
                     {/* todo do not create nested is not nested*/}
-                    <Messages  messages={this.props.value.children}/>
+                    <Messages
+                        sorted={this.props.value.children}
+                        onClick={this.props.onClick}
+                    />
                 </div>
             </div>
         )

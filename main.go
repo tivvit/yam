@@ -57,52 +57,68 @@ func fakeMesages() []Message {
 	return []Message{
 		{
 			Text: "Hi",
+			Id: uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "Hello",
+					Id: uuid.NewV4().String(),
 				},
 			},
 		},
 		{
 			Text: "I wanted to ask",
+			Id: uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "About?",
+					Id: uuid.NewV4().String(),
 				},
 				{
 					Text: "The project",
+					Id: uuid.NewV4().String(),
+
 				},
 				{
 					Text: "Which one?",
+					Id: uuid.NewV4().String(),
 				},
 				{
 					Text: "The Main one",
+					Id: uuid.NewV4().String(),
 					Children: []Message{
 						{
 							Text: "What do you want to know?",
+							Id: uuid.NewV4().String(),
 						},
 						{
 							Text: "Is the design ready?",
+							Id: uuid.NewV4().String(),
 						},
 						{
 							Text: "Yes",
+							Id: uuid.NewV4().String(),
 						},
 					},
 				},
 				{
 					Text: "Oh and about the second too",
+					Id: uuid.NewV4().String(),
 					Children: []Message{
 						{
 							Text: "Which one is it?",
+							Id: uuid.NewV4().String(),
 						},
 						{
 							Text: "The secret one",
+							Id: uuid.NewV4().String(),
 						},
 						{
 							Text: "I nee to know if you told to Phillip",
+							Id: uuid.NewV4().String(),
 						},
 						{
 							Text: "I definitely did not",
+							Id: uuid.NewV4().String(),
 						},
 					},
 				},
@@ -110,9 +126,11 @@ func fakeMesages() []Message {
 		},
 		{
 			Text: "Bye",
+			Id: uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "Bye and thx",
+					Id: uuid.NewV4().String(),
 				},
 			},
 		},

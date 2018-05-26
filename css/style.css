@@ -41,6 +41,10 @@ body {
   padding-left: 1em;
 }
 
+.active {
+  background-color: dodgerblue !important;
+}
+
 #controls {
   border-top: solid 4px dodgerblue;
   flex: 0 0 auto;
