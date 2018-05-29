@@ -20,6 +20,7 @@ var App = React.createClass({
                 children: [],
                 sorted: [],
                 parent: null,
+                username: "tivvit"
             }
         )
     },
@@ -135,7 +136,7 @@ var App = React.createClass({
                 }
                 this.connection.send(JSON.stringify({
                     "op": "m",
-                    "author": "tivvit",
+                    "author": this.state.username,
                     "text": msg,
                     // "sent": (new Date()).getTime(),
                     "parent": this.state.parent,
