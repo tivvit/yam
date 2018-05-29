@@ -25,11 +25,11 @@ var App = React.createClass({
     },
 
     handleClick: function (e) {
-        this.setState({parent: e.target.dataset.id});
         if (this.state.parent !== null) {
             document.getElementById(this.state.parent).classList.toggle("active")
         }
-        e.target.classList.toggle("active");
+        this.setState({parent: e.currentTarget.dataset.id});
+        e.currentTarget.classList.toggle("active");
         document.getElementById("input").focus();
     },
 
@@ -111,7 +111,8 @@ var App = React.createClass({
             } else if (json.action === 'message') { // it's a single message
                 // input.removeAttr('disabled'); // let the user write another message
                 this.addMessage(json);
-                content.scrollTo(0, content.scrollHeight);
+                document.getElementById(json.id).scrollIntoView(false);
+                // content.scrollTo(0, content.scrollHeight);
             } else {
                 console.log('Hmm..., I\'ve never seen JSON like this: ', json);
             }
@@ -182,6 +183,7 @@ var App = React.createClass({
         //create a unike key for each new fruit item
         // var timestamp = (new Date()).getTime();
         // update the state object
+        message.unread = true; // todo backend
         if (message.children === undefined) {
             message.children = [];
             this.state.children[message.id] = message.children
@@ -258,13 +260,26 @@ let Message = React.createClass({
             <div className="message-wrap"
                  key={this.props.id}
             >
-                <div
-                    className="message"
-                    id={this.props.id}
-                    data-id={this.props.id}
-                    onClick={(e) => this.props.onClick(e)}
+                <div className=
+                         {"message" + (this.props.value.unread ? ' unread' : '')}
+                     id={this.props.id}
+                     data-id={this.props.id}
+                     onClick={(e) => this.props.onClick(e)}
                 >
-                    {this.props.value.text}
+                    <div className="content">
+                        <span className="author">
+                            {this.props.value.author}:&nbsp;
+                        </span>
+                        <span
+                            className="body"
+                        >
+                            {this.props.value.text}
+                        </span>
+                    </div>
+                    <div className="controls">
+                        <i className="fas fa-edit"></i>
+                        <i className="fas fa-external-link-alt"></i>
+                    </div>
                 </div>
                 <div className="nested">
                     {/* todo do not create nested is not nested*/}

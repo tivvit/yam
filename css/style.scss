@@ -48,13 +48,45 @@ body {
 .messages {
   .active {
     background-color: dodgerblue !important;
+    .author {
+      color: rgb(48, 48, 48) !important;
+    }
+  }
+
+  .unread {
+    .body {
+      font-weight: bold;
+    }
   }
 
   .message {
+    display: flex;
+    margin-bottom: .2em;
     padding: .2em .6em;
-    background: lightgray;
+    background: rgba(0, 0, 0, .04);
     border-radius: $radius;
-    margin-bottom: .1em;
+
+    &:hover {
+      .controls {
+        display: block;
+      }
+    }
+
+    .content {
+      flex: 1 1 auto;
+
+      .author {
+        color: rgb(144, 144, 144);
+      }
+
+      .body {
+      }
+    }
+
+    .controls {
+      display: none;
+      flex: 0 0 auto;
+    }
   }
 
   .nested {
