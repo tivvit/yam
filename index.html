@@ -5,6 +5,9 @@
     <title>YAM</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="676209471025-g2lv2e18j2bog303ldoqvrv5des6im7g.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
 <div id="menu">
@@ -14,6 +17,23 @@
         <div>very long user</div>
     </div>
     <div id="status">
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+        <script>
+          function onSignIn(googleUser) {
+            // Useful data for your client-side scripts:
+            var profile = googleUser.getBasicProfile();
+            console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+            console.log('Full Name: ' + profile.getName());
+            console.log('Given Name: ' + profile.getGivenName());
+            console.log('Family Name: ' + profile.getFamilyName());
+            console.log("Image URL: " + profile.getImageUrl());
+            console.log("Email: " + profile.getEmail());
+
+            // The ID token you need to pass to your backend:
+            var id_token = googleUser.getAuthResponse().id_token;
+            console.log("ID Token: " + id_token);
+          };
+        </script>
         <div id="statusMessage">Unknown</div>
         <div id="user">tivvitmail@gmail.com</div>
     </div>
