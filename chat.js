@@ -138,7 +138,7 @@ var App = React.createClass({
                     "op": "m",
                     "author": this.state.username,
                     "text": msg,
-                    // "sent": (new Date()).getTime(),
+                    "sent": Math.floor(Date.now()),
                     "parent": this.state.parent,
                     // "parent": "0e67bbc3-4329-42a0-845a-9fdd4e5ae65d",
                     // "parent": "c1a861bc-2c01-4777-909a-97bd57dbe80d",
@@ -190,6 +190,9 @@ var App = React.createClass({
             this.state.children[message.id] = message.children
         }
         if (message.parent !== undefined) {
+            if (this.state.children[message.parent] === undefined) {
+                this.state.children[message.parent] = []
+            }
             this.state.children[message.parent].push(message)
         } else {
             this.state.messages[message.id] = message;
@@ -227,7 +230,8 @@ let Messages = React.createClass({
             return null
         }
         this.props.sorted.sort(function (a, b) {
-            return a.text.localeCompare(b.text);
+            // return a.text.localeCompare(b.text);
+            return a.received > b.received;
         });
         return (
             <div className="container messages">

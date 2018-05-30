@@ -22,17 +22,21 @@ type Message struct {
 	Text     string    `json:"text"`
 	Id       string    `json:"id,omitempty"`
 	Action   string    `json:"action,omitempty"`
-	Sent     time.Time `json:"sent,omitempty"`
+	Sent     int64     `json:"sent,omitempty"`
 	Author   string    `json:"author,omitempty"`
-	Received time.Time `json:"received,omitempty"`
+	Received int64     `json:"received,omitempty"`
 	Parent   string    `json:"parent,omitempty"`
-	Seen     time.Time `json:"seen,omitempty"`
+	Seen     int64     `json:"seen,omitempty"`
 	Children []Message `json:"children,omitempty"`
 }
 
 func (message *Message) markSeen() {
 	// todo only if not seen
-	message.Seen = time.Now()
+	message.Seen = UnixTimeMiliNow()
+}
+
+func UnixTimeMiliNow() int64 {
+	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
 func newMessage(message *Message) {
@@ -40,6 +44,7 @@ func newMessage(message *Message) {
 	if message.Id == "" {
 		message.Id = uuid.NewV4().String()
 	}
+	message.Received = UnixTimeMiliNow()
 	message.Action = "message" // todo unify with op
 }
 
@@ -52,73 +57,71 @@ type History struct {
 	Messages []Message `json:"messages"`
 }
 
-
 func fakeMesages() []Message {
 	return []Message{
 		{
 			Text: "Hi",
-			Id: uuid.NewV4().String(),
+			Id:   uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "Hello",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 				},
 			},
 		},
 		{
 			Text: "I wanted to ask",
-			Id: uuid.NewV4().String(),
+			Id:   uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "About?",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 				},
 				{
 					Text: "The project",
-					Id: uuid.NewV4().String(),
-
+					Id:   uuid.NewV4().String(),
 				},
 				{
 					Text: "Which one?",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 				},
 				{
 					Text: "The Main one",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 					Children: []Message{
 						{
 							Text: "What do you want to know?",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 						{
 							Text: "Is the design ready?",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 						{
 							Text: "Yes",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 					},
 				},
 				{
 					Text: "Oh and about the second too",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 					Children: []Message{
 						{
 							Text: "Which one is it?",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 						{
 							Text: "The secret one",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 						{
 							Text: "I nee to know if you told to Phillip",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 						{
 							Text: "I definitely did not",
-							Id: uuid.NewV4().String(),
+							Id:   uuid.NewV4().String(),
 						},
 					},
 				},
@@ -126,11 +129,11 @@ func fakeMesages() []Message {
 		},
 		{
 			Text: "Bye",
-			Id: uuid.NewV4().String(),
+			Id:   uuid.NewV4().String(),
 			Children: []Message{
 				{
 					Text: "Bye and thx",
-					Id: uuid.NewV4().String(),
+					Id:   uuid.NewV4().String(),
 				},
 			},
 		},
