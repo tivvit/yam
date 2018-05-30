@@ -148,6 +148,11 @@ var App = React.createClass({
                 // disable the input field to make the user wait until server
                 // sends back response
                 // input.attr('disabled', 'disabled');
+            } else if (event.keyCode === 27) {
+                if (this.state.parent !== null) {
+                    document.getElementById(this.state.parent).classList.toggle("active")
+                }
+                this.setState({parent: null});
             }
         }.bind(this));
 
@@ -181,9 +186,9 @@ var App = React.createClass({
     },
 
     addMessage: function (message) {
-        //create a unike key for each new fruit item
-        // var timestamp = (new Date()).getTime();
-        // update the state object
+        message.sent = new Date(message.sent);
+        message.received = new Date(message.received);
+
         message.unread = true; // todo backend
         if (message.children === undefined) {
             message.children = [];
@@ -280,6 +285,9 @@ let Message = React.createClass({
                         >
                             {this.props.value.text}
                         </span>
+                    </div>
+                    <div className="datetime">
+                        {this.props.value.received ? this.props.value.received.toLocaleString() : ''}
                     </div>
                     <div className="controls">
                         <i className="fas fa-edit"></i>

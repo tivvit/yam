@@ -62,6 +62,9 @@ body {
 .messages .message .content .author {
   color: #909090;
 }
+.messages .message .datetime {
+  color: #909090;
+}
 .messages .message .controls {
   display: none;
   flex: 0 0 auto;
