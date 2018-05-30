@@ -311,6 +311,29 @@ ReactDOM.render(
     document.getElementById('content')
 );
 
+var User = React.createClass({
+    getInitialState: function () {
+        return (
+            {
+                username: "tivvit"
+            }
+        )
+    },
+    render: function () {
+        return (
+            <span>
+                {this.state.username}
+            </span>
+        );
+    }
+});
+
+
+ReactDOM.render(
+    <User/>,
+    document.getElementById('user')
+);
+
 
 // var input = document.getElementById('input');
 //
