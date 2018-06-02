@@ -1,0 +1,12 @@
+{
+  "name": "yam",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "babel js -d lib",
+    "css": "sass css/style.scss css/style.css"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1"
+  }
+}

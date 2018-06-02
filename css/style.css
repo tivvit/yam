@@ -23,6 +23,10 @@ body {
   flex: 0 0 auto;
 }
 
+.hide {
+  display: none;
+}
+
 #chat {
   flex-direction: column;
   display: flex;

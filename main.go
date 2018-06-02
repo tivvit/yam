@@ -6,12 +6,11 @@ import (
 	"log"
 	"encoding/json"
 	"net/http"
-	"time"
 	"github.com/satori/go.uuid"
-    "github.com/kelseyhightower/envconfig"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/tivvit/yam/structs"
 	"gopkg.in/couchbase/gocb.v1"
-	"fmt"
+	"github.com/tivvit/yam/yam"
 )
 
 var addr = flag.String("addr", "localhost:1337", "http service address")
@@ -22,51 +21,12 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-type Message struct {
-	Text     string    `json:"text"`
-	Id       string    `json:"id,omitempty"`
-	Action   string    `json:"action,omitempty"`
-	Sent     int64     `json:"sent,omitempty"`
-	Author   string    `json:"author,omitempty"`
-	Received int64     `json:"received,omitempty"`
-	Parent   string    `json:"parent,omitempty"`
-	Seen     int64     `json:"seen,omitempty"`
-	Children []Message `json:"children,omitempty"`
-}
-
-func (message *Message) markSeen() {
-	// todo only if not seen
-	message.Seen = UnixTimeMiliNow()
-}
-
-func UnixTimeMiliNow() int64 {
-	return time.Now().UnixNano() / int64(time.Millisecond)
-}
-
-func newMessage(message *Message) {
-	// todo store / edit message
-	if message.Id == "" {
-		message.Id = uuid.NewV4().String()
-	}
-	message.Received = UnixTimeMiliNow()
-	message.Action = "message" // todo unify with op
-}
-
-type Operation struct {
-	Operation string `json:"op"`
-}
-
-type History struct {
-	Action   string    `json:"action"`
-	Messages []Message `json:"messages"`
-}
-
-func fakeMesages() []Message {
-	return []Message{
+func fakeMesages() []structs.Message {
+	return []structs.Message{
 		{
 			Text: "Hi",
 			Id:   uuid.NewV4().String(),
-			Children: []Message{
+			Children: []structs.Message{
 				{
 					Text: "Hello",
 					Id:   uuid.NewV4().String(),
@@ -76,7 +36,7 @@ func fakeMesages() []Message {
 		{
 			Text: "I wanted to ask",
 			Id:   uuid.NewV4().String(),
-			Children: []Message{
+			Children: []structs.Message{
 				{
 					Text: "About?",
 					Id:   uuid.NewV4().String(),
@@ -92,7 +52,7 @@ func fakeMesages() []Message {
 				{
 					Text: "The Main one",
 					Id:   uuid.NewV4().String(),
-					Children: []Message{
+					Children: []structs.Message{
 						{
 							Text: "What do you want to know?",
 							Id:   uuid.NewV4().String(),
@@ -110,7 +70,7 @@ func fakeMesages() []Message {
 				{
 					Text: "Oh and about the second too",
 					Id:   uuid.NewV4().String(),
-					Children: []Message{
+					Children: []structs.Message{
 						{
 							Text: "Which one is it?",
 							Id:   uuid.NewV4().String(),
@@ -134,7 +94,7 @@ func fakeMesages() []Message {
 		{
 			Text: "Bye",
 			Id:   uuid.NewV4().String(),
-			Children: []Message{
+			Children: []structs.Message{
 				{
 					Text: "Bye and thx",
 					Id:   uuid.NewV4().String(),
@@ -144,7 +104,8 @@ func fakeMesages() []Message {
 	}
 }
 
-var storage []Message
+var bucket *gocb.Bucket
+var conf structs.Config
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -153,30 +114,68 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer c.Close()
+	logged := false
+	var login *structs.Login
+	// todo goroutine ?
 	for {
+		// todo this will be routine with channels
 		mt, msg, err := c.ReadMessage()
 		if err != nil {
+			// todo handle "ERR read: websocket: close 1001 (going away)"
 			log.Println("ERR read:", err)
 			break
 		}
-		op := Operation{}
+		log.Print(logged)
+		// todo send groups after login
+		// todo send new groups
+		op := structs.Operation{}
 		err = json.Unmarshal(msg, &op)
+		log.Printf("recv: %s", msg)
 		if err != nil {
 			log.Println("Unknown OP")
 		} else {
 			switch op.Operation {
 			case "m": // message
-				m := processMessage(msg)
-				storage = append(storage, *m)
-				log.Println(len(storage))
-				sendResponse(m, c, mt)
+				if logged {
+					m := yam.ProcessMessage(bucket, msg)
+					//storage = append(storage, *m)
+					//log.Println(len(storage))
+					sendResponse(m, c, mt)
+				}
 			case "history":
-				sendResponse(History{
-					Messages: storage,
+				if logged {
+					rooms := yam.GetRooms(bucket, &conf, login.Login)
+					sendResponse(structs.History{
+						Messages: yam.ProcessHistory(bucket, &conf, rooms[0].Id),
+						Action:   "history",
+					}, c, mt)
+				}
+			case "room":
+				// todo
+				//r := structs.NewRoom()
+				//r.Users = []string{"tivvit", "other"}
+				//yam.StoreRoom(bucket, r)
+			case "login":
+				// todo add user to logged users
+				login = yam.ProcessLogin(msg)
+				logged = true
+				rooms := yam.GetRooms(bucket, &conf, login.Login)
+				// todo validate token
+				if len(rooms) == 0 {
+					yam.CreateSelfGroup(bucket, login.Login)
+					rooms = yam.GetRooms(bucket, &conf, login.Login)
+				}
+				yam.AddUser(bucket, login.Login)
+				sendResponse(structs.Rooms{
+					Rooms: rooms,
+					Action: "rooms",
+				}, c, mt)
+				sendResponse(structs.History{
+					Messages: yam.ProcessHistory(bucket, &conf, rooms[0].Id),
 					Action:   "history",
 				}, c, mt)
 			default:
-				log.Println("Unknown operation, ignororing ", msg)
+				log.Printf("Unknown operation, ignororing %s", msg)
 			}
 		}
 	}
@@ -194,68 +193,16 @@ func sendResponse(response interface{}, c *websocket.Conn, messageType int) {
 	}
 }
 
-//func sendHistory() *Message {
-//	return newMessage("a")
-//}
-
-func processMessage(message []byte) *Message {
-	log.Printf("recv: %s", message)
-	msg := Message{}
-	err := json.Unmarshal(message, &msg)
-	if err != nil {
-		log.Printf("json problem: %s %s", err, message)
-	}
-	newMessage(&msg)
-	return &msg
-}
-
-func writeCB(conf *structs.Config) {
-	cluster, err := gocb.Connect("couchbase://localhost")
-	cluster.Authenticate(gocb.PasswordAuthenticator{
-		Username: conf.DbUser,
-		Password: conf.DbPass,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	bucket, err := cluster.OpenBucket("test", "")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	bucket.Manager("", "").CreatePrimaryIndex("", true, false)
-
-	id := uuid.NewV4().String()
-	bucket.Upsert(id,
-		Message{
-			Text: "Hi",
-			Author: "tivvit",
-		}, 0)
-
-	// Get the value back
-	var inUser Message
-	bucket.Get(id, &inUser)
-	fmt.Printf("Message: %v\n", inUser)
-
-	// Use query
-	query := gocb.NewN1qlQuery("SELECT * FROM test WHERE $1 = author")
-	rows, _ := bucket.ExecuteN1qlQuery(query, []interface{}{"tivvit"})
-	var row interface{}
-	for rows.Next(&row) {
-		fmt.Printf("Row: %v", row)
-	}
-}
-
 func main() {
-	storage = fakeMesages()
+	// todo keep all connected clients
 	flag.Parse()
 	log.SetFlags(0)
-	var conf structs.Config
-	err := envconfig.Process("myapp", &conf)
+	err := envconfig.Process("yam", &conf)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	writeCB(&conf)
+	bucket = yam.GetCB(&conf)
 	http.HandleFunc("/", handler)
+	log.Print("serving")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
