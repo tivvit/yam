@@ -290,6 +290,7 @@ let App = React.createClass({
         message.received = new Date(message.received);
 
         // todo room has to be defined per message !!!
+        // todo maybe children does not have to be in scopes
 
         message.unread = true; // todo backend
         if (message.children === undefined) {
