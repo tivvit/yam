@@ -8,6 +8,10 @@ import (
 	"net/http"
 	"time"
 	"github.com/satori/go.uuid"
+    "github.com/kelseyhightower/envconfig"
+	"github.com/tivvit/yam/structs"
+	"gopkg.in/couchbase/gocb.v1"
+	"fmt"
 )
 
 var addr = flag.String("addr", "localhost:1337", "http service address")
@@ -205,10 +209,53 @@ func processMessage(message []byte) *Message {
 	return &msg
 }
 
+func writeCB(conf *structs.Config) {
+	cluster, err := gocb.Connect("couchbase://localhost")
+	cluster.Authenticate(gocb.PasswordAuthenticator{
+		Username: conf.DbUser,
+		Password: conf.DbPass,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	bucket, err := cluster.OpenBucket("test", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bucket.Manager("", "").CreatePrimaryIndex("", true, false)
+
+	id := uuid.NewV4().String()
+	bucket.Upsert(id,
+		Message{
+			Text: "Hi",
+			Author: "tivvit",
+		}, 0)
+
+	// Get the value back
+	var inUser Message
+	bucket.Get(id, &inUser)
+	fmt.Printf("Message: %v\n", inUser)
+
+	// Use query
+	query := gocb.NewN1qlQuery("SELECT * FROM test WHERE $1 = author")
+	rows, _ := bucket.ExecuteN1qlQuery(query, []interface{}{"tivvit"})
+	var row interface{}
+	for rows.Next(&row) {
+		fmt.Printf("Row: %v", row)
+	}
+}
+
 func main() {
 	storage = fakeMesages()
 	flag.Parse()
 	log.SetFlags(0)
+	var conf structs.Config
+	err := envconfig.Process("myapp", &conf)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	writeCB(&conf)
 	http.HandleFunc("/", handler)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
