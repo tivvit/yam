@@ -31,15 +31,6 @@ function onSignIn(googleUser) {
     document.getElementById("logout").classList.toggle("hide");
 }
 
-function signOut() {
-    let auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-        console.log('User signed out.');
-        document.getElementById("gsignin").classList.toggle("hide");
-        document.getElementById("logout").classList.toggle("hide");
-        chat.logout();
-    });
-}
 
 let App = React.createClass({
     getInitialState: function () {
@@ -311,11 +302,11 @@ let App = React.createClass({
             //     // this.state.rooms[message.parent].messages[message.id] = message;
             //     this.state.rooms[message.parent].sorted.push(message);
             // } else {
-                // parent is message (room does not match)
-                if (this.state.children[message.parent] === undefined) {
-                    this.state.children[message.parent] = []
-                }
-                this.state.children[message.parent].push(message)
+            // parent is message (room does not match)
+            if (this.state.children[message.parent] === undefined) {
+                this.state.children[message.parent] = []
+            }
+            this.state.children[message.parent].push(message)
             // }
         } else {
             console.log("no parent " + message);
@@ -328,13 +319,49 @@ let App = React.createClass({
         this.setState({children: this.state.children});
     },
 
+    signOut: function signOut() {
+        console.log('User signed out.');
+        // let auth2 = gapi.auth2.getAuthInstance();
+        // auth2.signOut().then(function () {
+        //     console.log('User signed out.');
+        //     document.getElementById("gsignin").classList.toggle("hide");
+        //     document.getElementById("logout").classList.toggle("hide");
+        //     chat.logout();
+        // });
+    },
+
     render: function () {
         return (
-            <div className="component-wrapper">
-                <Messages
-                      sorted={this.state.children[this.state.room]}
-                      onClick={this.handleClick}
-                />
+            <div id="yamWrap">
+                <div id="menu">
+                    <div id="users">
+                        <div>user 1</div>
+                        <div>user 2</div>
+                        <div>very long user</div>
+                    </div>
+                    <div id="status">
+                        <div id="gsignin" className="g-signin2"
+                             data-onsuccess="onSignIn"
+                             data-theme="dark"></div>
+                        <div id="statusMessage">Unknown</div>
+                        <div id="user"></div>
+                        <a href="#" id="logout" className="hide"
+                           onClick={this.signOut()}>Sign out</a>
+                    </div>
+                </div>
+                <div id="chat">
+                    <div id="content">
+                        <div className="component-wrapper">
+                            <Messages
+                                sorted={this.state.children[this.state.room]}
+                                onClick={this.handleClick}
+                            />
+                        </div>
+                    </div>
+                    <div id="controls">
+                        <div id="input" contentEditable="true"></div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -428,33 +455,33 @@ let Message = React.createClass({
 
 let chat = ReactDOM.render(
     <App/>,
-    document.getElementById('content')
+    document.getElementById('yam')
 );
 
-let User = React.createClass({
-    getInitialState: function () {
-        return (
-            {
-                username: ""
-            }
-        )
-    },
-
-    setUsername: function (username) {
-        this.setState({username: username});
-    },
-
-    render: function () {
-        return (
-            <span>
-                {this.state.username}
-            </span>
-        );
-    }
-});
-
-
-let usr = ReactDOM.render(
-    <User/>,
-    document.getElementById('user')
-);
+// let User = React.createClass({
+//     getInitialState: function () {
+//         return (
+//             {
+//                 username: ""
+//             }
+//         )
+//     },
+//
+//     setUsername: function (username) {
+//         this.setState({username: username});
+//     },
+//
+//     render: function () {
+//         return (
+//             <span>
+//                 {this.state.username}
+//             </span>
+//         );
+//     }
+// });
+//
+//
+// let usr = ReactDOM.render(
+//     <User/>,
+//     document.getElementById('user')
+// );

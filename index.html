@@ -11,36 +11,15 @@
     <meta name="google-signin-scope" content="profile email">
     <meta name="google-signin-client_id"
           content="676209471025-g2lv2e18j2bog303ldoqvrv5des6im7g.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js" async  defer></script>
 </head>
 <body>
-<div id="menu">
-    <div id="users">
-        <div>user 1</div>
-        <div>user 2</div>
-        <div>very long user</div>
-    </div>
-    <div id="status">
-        <div id="gsignin" class="g-signin2" data-onsuccess="onSignIn"
-             data-theme="dark"></div>
-        <div id="statusMessage">Unknown</div>
-        <div id="user"></div>
-        <a href="#" id="logout" class="hide" onclick="signOut();">Sign out</a>
-    </div>
-</div>
-<div id="chat">
-    <div id="content">
-    </div>
-    <div id="controls">
-        <div id="input" contentEditable="true"></div>
-        <!--<input type="text" id="input"/>-->
-        <!--<div id="send">send</div>-->
-    </div>
+<div id="yam">
 </div>
 
 <script crossorigin src="https://unpkg.com/react@15/dist/react.js"></script>
 <script crossorigin
         src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 <script src="lib/chat.js" async defer></script>
 </body>
 </html>
