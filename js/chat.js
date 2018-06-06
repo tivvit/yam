@@ -45,13 +45,17 @@ let App = React.createClass({
     getInitialState: function () {
         return (
             {
-                rooms: {
-                    "0": {
-                        messages: [],
-                        children: [],
-                        sorted: [],
-                    }
+                children: {
+                    "0": [],
                 },
+                sorted: [],
+                // rooms: {
+                //     "0": {
+                //         // messages: [],
+                //         children: [],
+                //         sorted: [],
+                //     }
+                // },
                 parent: null,
                 username: "",
                 token: "",
@@ -76,18 +80,20 @@ let App = React.createClass({
 
     loginMsg: function () {
         this.addMessage({
-            "id": "0",
+            "id": "m0",
             "author": "admin",
             "text": "please login",
             "sent": Math.floor(Date.now()),
             "received": Math.floor(Date.now()),
+            "parent": "0",
         });
         this.addMessage({
-            "id": "1",
+            "id": "m1",
             "author": "admin",
             "text": "Lower left corner",
             "sent": Math.floor(Date.now()),
             "received": Math.floor(Date.now()),
+            "parent": "0",
         });
     },
 
@@ -202,13 +208,14 @@ let App = React.createClass({
                 // content.scrollTo(0, content.scrollHeight);
             } else if (json.action === 'rooms') {
                 rooms = this.state.rooms;
-                for (var i = 0; i < json.rooms.length; i++) {
-                    room = json.rooms[i];
-                    rooms[room.id] = {
-                        messages: [],
-                        sorted: [],
-                        children: [],
-                    }
+                for (let i = 0; i < json.rooms.length; i++) {
+                    this.state.children[json.rooms[json.rooms[i].id]] = []
+                    // room = json.rooms[i];
+                    // rooms[room.id] = {
+                    //     messages: [],
+                    //     sorted: [],
+                    //     children: [],
+                    // }
                 }
                 this.setState({
                     // todo tmp
@@ -295,36 +302,38 @@ let App = React.createClass({
         message.unread = true; // todo backend
         if (message.children === undefined) {
             message.children = [];
-            this.state.rooms[this.state.room].children[message.id] = message.children
+            this.state.children[message.id] = message.children
         }
         // todo it should never be undefined
         if (message.parent !== undefined) {
-            if (Object.keys(chat.state.rooms).includes(message.parent)) {
-                // parent is room
-                this.state.rooms[message.parent].messages[message.id] = message;
-                this.state.rooms[message.parent].sorted.push(message);
-            } else {
+            // if (Object.keys(chat.state.rooms).includes(message.parent)) {
+            //     // parent is room
+            //     // this.state.rooms[message.parent].messages[message.id] = message;
+            //     this.state.rooms[message.parent].sorted.push(message);
+            // } else {
                 // parent is message (room does not match)
-                if (this.state.rooms[this.state.room].children[message.parent] === undefined) {
-                    this.state.rooms[this.state.room].children[message.parent] = []
+                if (this.state.children[message.parent] === undefined) {
+                    this.state.children[message.parent] = []
                 }
-                this.state.rooms[this.state.room].children[message.parent].push(message)
-            }
+                this.state.children[message.parent].push(message)
+            // }
         } else {
-            this.state.rooms[this.state.room].messages[message.id] = message;
-            this.state.rooms[this.state.room].sorted.push(message);
+            console.log("no parent " + message);
+            // this.state.rooms[this.state.room].messages[message.id] = message;
+            // this.state.rooms[this.state.room].sorted.push(message);
         }
         recurseChildren.bind(this)(message);
         // set the state
-        this.setState({rooms: this.state.rooms});
+        // this.setState({rooms: this.state.rooms});
+        this.setState({children: this.state.children});
     },
 
     render: function () {
         return (
             <div className="component-wrapper">
-                <Messages messages={this.state.rooms[this.state.room].messages}
-                          sorted={this.state.rooms[this.state.room].sorted}
-                          onClick={this.handleClick}
+                <Messages
+                      sorted={this.state.children[this.state.room]}
+                      onClick={this.handleClick}
                 />
             </div>
         );
@@ -333,7 +342,7 @@ let App = React.createClass({
 
 function recurseChildren(message) {
     if (message.children !== undefined) {
-        this.state.rooms[this.state.room].children[message.id] = message.children;
+        this.state.children[message.id] = message.children;
         message.children.forEach(function (m) {
             recurseChildren.bind(this)(m)
         }.bind(this));
