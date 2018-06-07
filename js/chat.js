@@ -13,6 +13,7 @@ function online() {
 }
 
 function onSignIn(googleUser) {
+    console.log("kokot");
     // Useful data for your client-side scripts:
     let profile = googleUser.getBasicProfile();
     // console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -25,12 +26,11 @@ function onSignIn(googleUser) {
     // // The ID token you need to pass to your backend:
     let id_token = googleUser.getAuthResponse().id_token;
     // console.log("ID Token: " + id_token);
-    usr.setUsername(profile.getEmail());
+    // this.setUsername(profile.getEmail());
     chat.setUsername(profile.getEmail(), id_token);
     document.getElementById("gsignin").classList.toggle("hide");
     document.getElementById("logout").classList.toggle("hide");
 }
-
 
 let App = React.createClass({
     getInitialState: function () {
@@ -320,14 +320,13 @@ let App = React.createClass({
     },
 
     signOut: function signOut() {
-        console.log('User signed out.');
-        // let auth2 = gapi.auth2.getAuthInstance();
-        // auth2.signOut().then(function () {
-        //     console.log('User signed out.');
-        //     document.getElementById("gsignin").classList.toggle("hide");
-        //     document.getElementById("logout").classList.toggle("hide");
-        //     chat.logout();
-        // });
+        let auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            console.log('User signed out.');
+            document.getElementById("gsignin").classList.toggle("hide");
+            document.getElementById("logout").classList.toggle("hide");
+            chat.logout();
+        });
     },
 
     render: function () {
@@ -340,13 +339,17 @@ let App = React.createClass({
                         <div>very long user</div>
                     </div>
                     <div id="status">
-                        <div id="gsignin" className="g-signin2"
+                        <div id="gsignin"
+                             className="g-signin2"
                              data-onsuccess="onSignIn"
-                             data-theme="dark"></div>
+                             data-theme="dark">
+                        </div>
                         <div id="statusMessage">Unknown</div>
                         <div id="user"></div>
-                        <a href="#" id="logout" className="hide"
-                           onClick={this.signOut()}>Sign out</a>
+                        <a href="#"
+                           id="logout"
+                           className="hide"
+                           onClick={this.signOut}>Sign out</a>
                     </div>
                 </div>
                 <div id="chat">

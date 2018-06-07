@@ -175,7 +175,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Action:   "history",
 				}, c, mt)
 			default:
-				log.Printf("Unknown operation, ignororing %s", msg)
+				log.Printf("Unknown operation, ignororing %s %s", operation, msg)
 			}
 		}
 	}

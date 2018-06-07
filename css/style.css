@@ -3,8 +3,7 @@ body {
   margin: 0;
   height: 100%;
   position: absolute;
-  width: 100%;
-}
+  width: 100%; }
 
 #yam, #yamWrap {
   padding: 0;
@@ -12,108 +11,85 @@ body {
   height: 100%;
   display: flex;
   position: absolute;
-  width: 100%;
-}
+  width: 100%; }
 
 #menu {
-  padding: 0.2em 0.4em 0.2em 0.2em;
+  padding: .2em .4em .2em .2em;
   border-right: 4px solid dodgerblue;
   flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-}
-#menu #users {
-  overflow-y: scroll;
-  flex: 10 1 auto;
-}
-#menu #status {
-  border-top: 1px solid #ccc;
-  flex: 0 0 auto;
-}
+  flex-direction: column; }
+  #menu #users {
+    overflow-y: scroll;
+    flex: 10 1 auto; }
+  #menu #status {
+    border-top: 1px solid #ccc;
+    flex: 0 0 auto; }
 
 .hide {
-  display: none;
-}
+  display: none; }
 
 #chat {
   flex-direction: column;
   display: flex;
-  width: 100%;
-}
+  width: 100%; }
 
 #input {
   border-radius: 2px;
   border: 1px solid #ccc;
   margin-top: 10px;
   padding: 5px;
-  width: 400px;
-}
+  width: 400px; }
 
 .messages .active {
-  background-color: dodgerblue !important;
-}
-.messages .active .author {
-  color: #303030 !important;
-}
+  background-color: dodgerblue !important; }
+  .messages .active .author {
+    color: #303030 !important; }
 .messages .unread .body {
-  font-weight: bold;
-}
+  font-weight: bold; }
 .messages .message {
   display: flex;
-  margin-bottom: 0.2em;
-  padding: 0.2em 0.6em;
+  margin-bottom: .2em;
+  padding: .2em .6em;
   background: rgba(0, 0, 0, 0.04);
-  border-radius: 0.4em;
-}
-.messages .message:hover .controls {
-  display: block;
-}
-.messages .message .content {
-  flex: 1 1 auto;
-}
-.messages .message .content .author {
-  color: #909090;
-}
-.messages .message .datetime {
-  color: #909090;
-}
-.messages .message .controls {
-  display: none;
-  flex: 0 0 auto;
-}
+  border-radius: 0.4em; }
+  .messages .message:hover .controls {
+    display: block; }
+  .messages .message .content {
+    flex: 1 1 auto; }
+    .messages .message .content .author {
+      color: #909090; }
+  .messages .message .datetime {
+    color: #909090; }
+  .messages .message .controls {
+    display: none;
+    flex: 0 0 auto; }
 .messages .nested {
-  padding-left: 1em;
-}
+  padding-left: 1em; }
 
 #controls {
   border-top: solid 4px dodgerblue;
   flex: 0 0 auto;
-  display: flex;
-}
-#controls #input {
-  flex: 1 1 0;
-  margin: 0.4em;
-  min-height: 1em;
-}
-#controls #send {
-  background-color: darkseagreen;
-  flex: 0 0 content;
-  padding: 0.4em;
-  cursor: pointer;
-}
+  display: flex; }
+  #controls #input {
+    flex: 1 1 0;
+    margin: .4em;
+    min-height: 1em; }
+  #controls #send {
+    background-color: darkseagreen;
+    flex: 0 0 content;
+    padding: .4em;
+    cursor: pointer; }
 
 #content {
   overflow-y: scroll;
   flex: 10 1 auto;
-  padding: 0.2em;
-}
+  padding: .2em; }
 
 .online {
-  color: darkseagreen;
-}
+  color: darkseagreen; }
 
 .offline {
-  color: red;
-}
+  color: red; }
 
-/*# sourceMappingURL=css/style.css.map */
+/*# sourceMappingURL=style.css.map */
