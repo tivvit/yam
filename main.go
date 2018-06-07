@@ -6,7 +6,6 @@ import (
 	"log"
 	"encoding/json"
 	"net/http"
-	"github.com/satori/go.uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/tivvit/yam/structs"
 	"gopkg.in/couchbase/gocb.v1"
@@ -19,89 +18,6 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
-}
-
-func fakeMesages() []structs.Message {
-	return []structs.Message{
-		{
-			Text: "Hi",
-			Id:   uuid.NewV4().String(),
-			Children: []structs.Message{
-				{
-					Text: "Hello",
-					Id:   uuid.NewV4().String(),
-				},
-			},
-		},
-		{
-			Text: "I wanted to ask",
-			Id:   uuid.NewV4().String(),
-			Children: []structs.Message{
-				{
-					Text: "About?",
-					Id:   uuid.NewV4().String(),
-				},
-				{
-					Text: "The project",
-					Id:   uuid.NewV4().String(),
-				},
-				{
-					Text: "Which one?",
-					Id:   uuid.NewV4().String(),
-				},
-				{
-					Text: "The Main one",
-					Id:   uuid.NewV4().String(),
-					Children: []structs.Message{
-						{
-							Text: "What do you want to know?",
-							Id:   uuid.NewV4().String(),
-						},
-						{
-							Text: "Is the design ready?",
-							Id:   uuid.NewV4().String(),
-						},
-						{
-							Text: "Yes",
-							Id:   uuid.NewV4().String(),
-						},
-					},
-				},
-				{
-					Text: "Oh and about the second too",
-					Id:   uuid.NewV4().String(),
-					Children: []structs.Message{
-						{
-							Text: "Which one is it?",
-							Id:   uuid.NewV4().String(),
-						},
-						{
-							Text: "The secret one",
-							Id:   uuid.NewV4().String(),
-						},
-						{
-							Text: "I nee to know if you told to Phillip",
-							Id:   uuid.NewV4().String(),
-						},
-						{
-							Text: "I definitely did not",
-							Id:   uuid.NewV4().String(),
-						},
-					},
-				},
-			},
-		},
-		{
-			Text: "Bye",
-			Id:   uuid.NewV4().String(),
-			Children: []structs.Message{
-				{
-					Text: "Bye and thx",
-					Id:   uuid.NewV4().String(),
-				},
-			},
-		},
-	}
 }
 
 var bucket *gocb.Bucket
@@ -175,7 +91,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Action:   "history",
 				}, c, mt)
 			default:
-				log.Printf("Unknown operation, ignororing %s %s", operation, msg)
+				log.Printf("Unknown operation, ignororing %s %s", op.Operation, msg)
 			}
 		}
 	}

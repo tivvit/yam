@@ -15,8 +15,5 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1"
-  },
-  "dependencies": {
-    "node": "^10.3.0"
   }
 }

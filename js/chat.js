@@ -13,7 +13,6 @@ function online() {
 }
 
 function onSignIn(googleUser) {
-    console.log("kokot");
     // Useful data for your client-side scripts:
     let profile = googleUser.getBasicProfile();
     // console.log("ID: " + profile.getId()); // Don't send this directly to your server!
@@ -345,7 +344,11 @@ let App = React.createClass({
                              data-theme="dark">
                         </div>
                         <div id="statusMessage">Unknown</div>
-                        <div id="user"></div>
+                        <div id="user">
+                            <User
+                                username={this.state.username}
+                            />
+                        </div>
                         <a href="#"
                            id="logout"
                            className="hide"
@@ -456,35 +459,17 @@ let Message = React.createClass({
     }
 });
 
+let User = React.createClass({
+    render: function () {
+        return (
+            <span>
+                {this.props.username}
+            </span>
+        );
+    }
+});
+
 let chat = ReactDOM.render(
     <App/>,
     document.getElementById('yam')
 );
-
-// let User = React.createClass({
-//     getInitialState: function () {
-//         return (
-//             {
-//                 username: ""
-//             }
-//         )
-//     },
-//
-//     setUsername: function (username) {
-//         this.setState({username: username});
-//     },
-//
-//     render: function () {
-//         return (
-//             <span>
-//                 {this.state.username}
-//             </span>
-//         );
-//     }
-// });
-//
-//
-// let usr = ReactDOM.render(
-//     <User/>,
-//     document.getElementById('user')
-// );
