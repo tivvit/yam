@@ -27,7 +27,7 @@ body {
   display: flex;
   flex-direction: column;
 
-  #users {
+  #rooms {
     overflow-y: scroll;
     flex: 10 1 auto;
   }
@@ -151,4 +151,12 @@ body {
 
 .offline {
   color: red;
+}
+
+#addRoom {
+  position: absolute;
+  background: white;
+  width: 100%;
+  height: 100%;
+  padding: 2em;
 }

@@ -51,6 +51,7 @@ let App = React.createClass({
                 token: "",
                 logged: false,
                 room: "0",
+                rooms: [],
             }
         )
     },
@@ -101,6 +102,11 @@ let App = React.createClass({
         e.currentTarget.classList.toggle("active");
         document.getElementById("input").focus();
     },
+
+    changeRoom: function (e) {
+        this.setState({room: e.currentTarget.dataset.id});
+    },
+
 
     login: function () {
         if (!this.logged && this.state.username !== "") {
@@ -197,9 +203,10 @@ let App = React.createClass({
                 document.getElementById(json.id).scrollIntoView(false);
                 // content.scrollTo(0, content.scrollHeight);
             } else if (json.action === 'rooms') {
-                rooms = this.state.rooms;
+                rooms = [];
                 for (let i = 0; i < json.rooms.length; i++) {
-                    this.state.children[json.rooms[json.rooms[i].id]] = []
+                    this.state.children[json.rooms[json.rooms[i].id]] = [];
+                    rooms.push(json.rooms[i]);
                     // room = json.rooms[i];
                     // rooms[room.id] = {
                     //     messages: [],
@@ -328,14 +335,53 @@ let App = React.createClass({
         });
     },
 
+    showRooms: function (event) {
+        document.getElementById("addRoom").classList.toggle("hide");
+    },
+
+    roomCancel: function (event) {
+        document.getElementById("addRoom").classList.toggle("hide");
+        event.preventDefault()
+    },
+
+    addRoom: function (event) {
+        users = document.getElementById("roomUsers").value.split(",").map(function(e){return e.trim();}).filter(function(e){return e});
+        users.push(this.state.username);
+        this.connection.send(JSON.stringify({
+                "op": "room",
+                "name": document.getElementById("roomName").value,
+                "users": users,
+            }
+        ));
+        console.log(users);
+        document.getElementById("addRoom").classList.toggle("hide");
+        event.preventDefault()
+    },
+
     render: function () {
         return (
             <div id="yamWrap">
+                <div id="addRoom" className="hide">
+                    <h1>Add rooom</h1>
+                    <div>
+                        Name: <input type="text" name="name" id="roomName"/>
+                    </div>
+                    <div>
+                        Users: <input type="text" name="users" id="roomUsers"/>
+                    </div>
+                    <div>
+                        <a href="" id="roomOk" onClick={this.addRoom}>Ok</a>
+                    </div>
+                    <div><a href="" id="roomCancel"
+                            onClick={this.roomCancel}>Cancel</a></div>
+                </div>
                 <div id="menu">
-                    <div id="users">
-                        <div>user 1</div>
-                        <div>user 2</div>
-                        <div>very long user</div>
+                    <div id="rooms">
+                        <Rooms
+                            rooms={this.state.rooms}
+                            changeRoom={this.changeRoom}
+                        />
+                        <div onClick={this.showRooms}>+</div>
                     </div>
                     <div id="status">
                         <div id="gsignin"
@@ -465,6 +511,32 @@ let User = React.createClass({
             <span>
                 {this.props.username}
             </span>
+        );
+    }
+});
+
+
+let Rooms = React.createClass({
+    render: function () {
+        return (
+            <div className="rooms">
+                {
+                    this.props.rooms.map(function (r) {
+                        return <div
+                            key={r.id}
+                            id={r.id}
+                            data-id={r.id}
+                            onClick={this.props.changeRoom}
+                        >{r.name} ({r.users})
+                            {/*{*/}
+                                {/*r.users.map(function (u) {*/}
+                                    {/*return <span key={u}>{u}</span>*/}
+                                {/*}.bind(this, r))*/}
+                            {/*}*/}
+                        )</div>
+                    }.bind(this))
+                }
+            </div>
         );
     }
 });

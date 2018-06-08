@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"github.com/tivvit/yam/structs"
+    "github.com/getlantern/deepcopy"
 )
 
 func GetRooms(bucket *gocb.Bucket, conf *structs.Config, user string) []structs.Room {
@@ -18,7 +19,9 @@ func GetRooms(bucket *gocb.Bucket, conf *structs.Config, user string) []structs.
 	var row structs.Room
 	var rooms []structs.Room
 	for rows.Next(&row) {
-		rooms = append(rooms, row)
+		r := structs.Room{}
+		deepcopy.Copy(&r, row)
+		rooms = append(rooms, r)
 	}
 	return rooms
 }

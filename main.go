@@ -67,10 +67,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					}, c, mt)
 				}
 			case "room":
-				// todo
-				//r := structs.NewRoom()
-				//r.Users = []string{"tivvit", "other"}
-				//yam.StoreRoom(bucket, r)
+				r := structs.NewRoom(bucket)
+				room := structs.Room{}
+				err := json.Unmarshal(msg, &room)
+				if err != nil {
+					log.Printf("json problem: %s %s", err, msg)
+				}
+				r.Users = room.Users
+				r.Name = room.Name
+				yam.StoreRoom(bucket, r)
+				// todo send new room notification
 			case "login":
 				// todo add user to logged users
 				login = yam.ProcessLogin(msg)
@@ -86,8 +92,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Rooms: rooms,
 					Action: "rooms",
 				}, c, mt)
+				var  messages []structs.Message
+				for _, room := range rooms {
+					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
+						messages = append(messages, message)
+					}
+				}
 				sendResponse(structs.History{
-					Messages: yam.ProcessHistory(bucket, &conf, rooms[0].Id),
+					Messages: messages,
 					Action:   "history",
 				}, c, mt)
 			default:
