@@ -22,6 +22,7 @@ var upgrader = websocket.Upgrader{
 
 var bucket *gocb.Bucket
 var conf structs.Config
+var connected []string
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -36,6 +37,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		// todo this will be routine with channels
 		mt, msg, err := c.ReadMessage()
+		c.SetCloseHandler(func (code int, text string) error {
+			log.Print("CLOSING!")
+			// todo remove from connected
+			return nil
+		})
 		if err != nil {
 			// todo handle "ERR read: websocket: close 1001 (going away)"
 			log.Println("ERR read:", err)
@@ -84,6 +90,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			case "login":
 				// todo add user to logged users
 				login = yam.ProcessLogin(msg)
+				connected = append(connected, login.Login)
+				log.Print("Logged: ", connected)
 				logged = true
 				rooms := yam.GetRooms(bucket, &conf, login.Login)
 				// todo validate token
