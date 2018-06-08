@@ -66,8 +66,9 @@ func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []st
 	return messages
 }
 
-func CreateSelfGroup(bucket *gocb.Bucket, username string) {
+func CreateSelfRoom(bucket *gocb.Bucket, username string) {
 	r := structs.NewRoom(bucket)
+	r.Name = "personal"
 	r.Users = []string{username}
 	StoreRoom(bucket, r)
 	m := structs.Message{}

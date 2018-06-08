@@ -88,7 +88,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				rooms := yam.GetRooms(bucket, &conf, login.Login)
 				// todo validate token
 				if len(rooms) == 0 {
-					yam.CreateSelfGroup(bucket, login.Login)
+					yam.CreateSelfRoom(bucket, login.Login)
 					rooms = yam.GetRooms(bucket, &conf, login.Login)
 				}
 				yam.AddUser(bucket, login.Login)
