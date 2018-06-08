@@ -9,3 +9,8 @@ type Rooms struct {
 	Action string `json:"action"`
 	Rooms  []Room `json:"rooms"`
 }
+
+type RoomAction struct {
+	Action string `json:"action"`
+	Room  Room `json:"room"`
+}

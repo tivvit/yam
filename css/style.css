@@ -26,6 +26,17 @@ body {
   overflow-y: scroll;
   flex: 10 1 auto;
 }
+#menu #rooms .room {
+  padding: 0.1em 0;
+  cursor: pointer;
+}
+#menu #rooms .room:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+#menu #rooms .room .users {
+  font-size: 0.7em;
+  padding-left: 0.5em;
+}
 #menu #status {
   border-top: 1px solid #ccc;
   flex: 0 0 auto;

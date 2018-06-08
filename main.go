@@ -77,6 +77,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				r.Name = room.Name
 				yam.StoreRoom(bucket, r)
 				// todo send new room notification
+				sendResponse(structs.RoomAction{
+					Room: *r,
+					Action: "room",
+				}, c, mt)
 			case "login":
 				// todo add user to logged users
 				login = yam.ProcessLogin(msg)

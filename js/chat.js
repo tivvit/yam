@@ -219,6 +219,11 @@ let App = React.createClass({
                     room: json.rooms[0].id,
                     rooms: rooms,
                 });
+            } else if (json.action === 'room') {
+                this.state.rooms.push(json.room);
+                this.setState({
+                    rooms: this.state.rooms,
+                })
             } else {
                 console.log('Hmm..., I\'ve never seen JSON like this: ', json);
             }
@@ -231,6 +236,8 @@ let App = React.createClass({
 
         this.loginMsg();
         this.connect();
+
+        document.getElementById("roomName").value = Math.random().toString(36).substr(2, 8);
 
         input.addEventListener('keydown', function (event) {
             if (event.keyCode === 13) {
@@ -345,7 +352,11 @@ let App = React.createClass({
     },
 
     addRoom: function (event) {
-        users = document.getElementById("roomUsers").value.split(",").map(function(e){return e.trim();}).filter(function(e){return e});
+        users = document.getElementById("roomUsers").value.split(",").map(function (e) {
+            return e.trim();
+        }).filter(function (e) {
+            return e
+        });
         users.push(this.state.username);
         this.connection.send(JSON.stringify({
                 "op": "room",
@@ -353,7 +364,8 @@ let App = React.createClass({
                 "users": users,
             }
         ));
-        console.log(users);
+        document.getElementById("roomUsers").value = "";
+        document.getElementById("roomName").value = Math.random().toString(36).substr(2, 8);
         document.getElementById("addRoom").classList.toggle("hide");
         event.preventDefault()
     },
@@ -379,9 +391,14 @@ let App = React.createClass({
                     <div id="rooms">
                         <Rooms
                             rooms={this.state.rooms}
+                            username={this.state.username}
                             changeRoom={this.changeRoom}
                         />
-                        <div onClick={this.showRooms}>+</div>
+                        <div
+                            onClick={this.showRooms}
+                            className="room"
+                        >+
+                        </div>
                     </div>
                     <div id="status">
                         <div id="gsignin"
@@ -527,13 +544,18 @@ let Rooms = React.createClass({
                             id={r.id}
                             data-id={r.id}
                             onClick={this.props.changeRoom}
-                        >{r.name} ({r.users})
-                            {/*{*/}
-                                {/*r.users.map(function (u) {*/}
-                                    {/*return <span key={u}>{u}</span>*/}
-                                {/*}.bind(this, r))*/}
-                            {/*}*/}
-                        )</div>
+                            className="room"
+                        >{r.name}
+                            <div className="users">
+                                {
+                                    r.users.filter(function (e) {
+                                        return e !== this.props.username
+                                    }.bind(this)).map(function (u, i) {
+                                        return <div key={r.id + u + i}>{u}</div>
+                                    }.bind(this))
+                                }
+                            </div>
+                        </div>
                     }.bind(this))
                 }
             </div>

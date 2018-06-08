@@ -30,6 +30,24 @@ body {
   #rooms {
     overflow-y: scroll;
     flex: 10 1 auto;
+
+    .room {
+      padding: .1em 0;
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+        //.users {
+        //  display: block;
+        //}
+      }
+
+      .users {
+        //display: none;
+        font-size: .7em;
+        padding-left: .5em;
+      }
+    }
   }
 
   #status {
