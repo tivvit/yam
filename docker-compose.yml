@@ -23,3 +23,7 @@ services:
       - "$PWD:/usr/share/nginx/html:ro"
       - ./default.conf:/etc/nginx/conf.d/default.conf
       - ./cert:/cert
+  server:
+    build: .
+    environment:
+      - "YAM_DB_ADDRESS=couchbase://cb"
