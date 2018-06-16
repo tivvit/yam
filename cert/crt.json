@@ -2,6 +2,8 @@
     "CN": "localhost",
     "hosts": [
         "localhost",
+        "yam",
+        "server",
         "127.0.0.1"
     ],
     "names": [
