@@ -1,0 +1,6 @@
+ca.csr
+ca.pem
+ca-key.pem
+srv.csr
+srv.pem
+srv-key.pem

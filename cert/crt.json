@@ -1,0 +1,15 @@
+{
+    "CN": "localhost",
+    "hosts": [
+        "localhost"
+    ],
+    "names": [
+        {
+            "C":  "CZ",
+            "L":  "Prague",
+            "O":  "tivvit.cz",
+            "OU": "WWW",
+            "ST": ""
+        }
+    ]
+}
