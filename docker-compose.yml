@@ -14,3 +14,9 @@ services:
       nofile: 80000
       core: 100000000
       memlock: 100000000
+  web:
+    image: nginx
+    volumes:
+    - "$PWD:/usr/share/nginx/html:ro"
+    ports:
+    - "80:80"
