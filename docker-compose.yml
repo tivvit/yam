@@ -21,9 +21,19 @@ services:
       - "443:443"
     volumes:
       - "$PWD:/usr/share/nginx/html:ro"
+      - "$PWD/js/config-dev.js:/usr/share/nginx/html/lib/config.js:ro"
+#      - "$PWD/js/config.js:/usr/share/nginx/html/lib/config.js:ro"
       - ./default.conf:/etc/nginx/conf.d/default.conf
       - ./cert:/cert
   server:
     build: .
     environment:
-      - "YAM_DB_ADDRESS=couchbase://cb"
+      - "YAM_DBADDRESS=couchbase://cb"
+      - "YAM_CERT=/cert/srv.pem"
+      - "YAM_CERTKEY=/cert/srv-key.pem"
+    volumes:
+      - "./cert:/cert"
+    ports:
+      - "1337:1337"
+    links:
+      - cb:cb

@@ -7,6 +7,7 @@ import (
 )
 
 func GetCB(conf *structs.Config) *gocb.Bucket {
+	log.Println(conf.DbAddress)
 	cluster, err := gocb.Connect(conf.DbAddress)
 	cluster.Authenticate(gocb.PasswordAuthenticator{
 		Username: conf.DbUser,

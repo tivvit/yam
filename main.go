@@ -12,7 +12,8 @@ import (
 	"github.com/tivvit/yam/yam"
 )
 
-var addr = flag.String("addr", "localhost:1337", "http service address")
+// todo config
+var addr = flag.String("addr", "0.0.0.0:1337", "http service address")
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
