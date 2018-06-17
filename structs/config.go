@@ -1,6 +1,7 @@
 package structs
 
 type Config struct {
+	Address string `default:"localhost:1337"`
 	DbAddress string `default:"couchbase://localhost"`
 	DbUser string `default:"test"`
 	DbPass string `default:"123456"`

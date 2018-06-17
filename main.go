@@ -12,9 +12,6 @@ import (
 	"github.com/tivvit/yam/yam"
 )
 
-// todo config
-var addr = flag.String("addr", "0.0.0.0:1337", "http service address")
-
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
@@ -138,12 +135,13 @@ func main() {
 	// todo keep all connected clients
 	flag.Parse()
 	log.SetFlags(0)
+	// todo config
 	err := envconfig.Process("yam", &conf)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	bucket = yam.GetCB(&conf)
 	http.HandleFunc("/", handler)
-	log.Print("serving")
-	log.Fatal(http.ListenAndServeTLS(*addr, conf.Cert, conf.CertKey, nil))
+	log.Printf("serving on %s\n", conf.Address)
+	log.Fatal(http.ListenAndServeTLS(conf.Address, conf.Cert, conf.CertKey, nil))
 }

@@ -28,6 +28,7 @@ services:
   server:
     build: .
     environment:
+      - "YAM_ADDRESS=0.0.0.0:1337"
       - "YAM_DBADDRESS=couchbase://cb"
       - "YAM_CERT=/cert/srv.pem"
       - "YAM_CERTKEY=/cert/srv-key.pem"
