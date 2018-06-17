@@ -18,9 +18,24 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+func closer(login *structs.Login, closed *bool) func(code int, text string) error {
+	return func(code int, text string) error {
+		if login != nil {
+			log.Printf("CLOSING! %v\n", login.Login)
+		} else {
+			log.Print("CLOSING! unknown")
+		}
+		// todo remove from connected
+		*closed = true
+		return nil
+	}
+}
+
 var bucket *gocb.Bucket
 var conf structs.Config
 var connected []string
+
+var _ map[string][]*websocket.Conn
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -30,22 +45,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	logged := false
+	closed := false
 	var login *structs.Login
 	// todo goroutine ?
 	for {
 		// todo this will be routine with channels
 		mt, msg, err := c.ReadMessage()
-		c.SetCloseHandler(func (code int, text string) error {
-			log.Print("CLOSING!")
-			// todo remove from connected
-			return nil
-		})
 		if err != nil {
 			// todo handle "ERR read: websocket: close 1001 (going away)"
-			log.Println("ERR read:", err)
+			switch err.(type) {
+			case *websocket.CloseError:
+				log.Printf("Connection closed %p\n", c)
+			default:
+				log.Println("ERR read: ", err)
+			}
 			break
 		}
-		log.Print(logged)
+		//log.Print(logged)
 		// todo send groups after login
 		// todo send new groups
 		op := structs.Operation{}
@@ -82,9 +98,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				yam.StoreRoom(bucket, r)
 				// todo send new room notification
 				sendResponse(structs.RoomAction{
-					Room: *r,
+					Room:   *r,
 					Action: "room",
 				}, c, mt)
+				// todo logout
 			case "login":
 				// todo add user to logged users
 				login = yam.ProcessLogin(msg)
@@ -99,10 +116,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				}
 				yam.AddUser(bucket, login.Login)
 				sendResponse(structs.Rooms{
-					Rooms: rooms,
+					Rooms:  rooms,
 					Action: "rooms",
 				}, c, mt)
-				var  messages []structs.Message
+				var messages []structs.Message
 				for _, room := range rooms {
 					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
 						messages = append(messages, message)
@@ -112,6 +129,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Messages: messages,
 					Action:   "history",
 				}, c, mt)
+				// todo store exact connection
+				c.SetCloseHandler(closer(login, &closed))
 			default:
 				log.Printf("Unknown operation, ignororing %s %s", op.Operation, msg)
 			}
