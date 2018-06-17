@@ -144,5 +144,5 @@ func main() {
 	bucket = yam.GetCB(&conf)
 	http.HandleFunc("/", handler)
 	log.Print("serving")
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	log.Fatal(http.ListenAndServeTLS(*addr, conf.Cert, conf.CertKey, nil))
 }
