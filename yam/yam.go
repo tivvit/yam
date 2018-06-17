@@ -86,6 +86,7 @@ func ProcessLogin(message []byte) *structs.Login {
 
 func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []structs.Message {
 	// todo sort
+	// todo limit 10??!
 	query := gocb.NewN1qlQuery(fmt.Sprintf("SELECT `%s`.* FROM `%s` WHERE $1 = parent LIMIT 10",
 		conf.DbBucket, conf.DbBucket))
 	rows, err := bucket.ExecuteN1qlQuery(query, []interface{}{room})
