@@ -288,7 +288,7 @@ let App = React.createClass({
         // this is an "echo" websocket service for testing pusposes
         // this.connection = new WebSocket('wss://echo.websocket.org');
         // // listen to onmessage event
-        // this.connection.onmessage = evt => {
+        // this.connection.onmessage = evt => {fs
         //     // add the new message to state
         //     this.setState({
         //         messages: this.state.messages.concat([evt.data])
