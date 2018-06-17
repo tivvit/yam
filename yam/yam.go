@@ -6,11 +6,14 @@ import (
 	"log"
 	"encoding/json"
 	"fmt"
+	"errors"
+	"github.com/getlantern/deepcopy"
 )
 
 func AddUser(bucket *gocb.Bucket, name string) {
 	var usr structs.User
 	_, err := bucket.Get(name, &usr)
+	// todo upsert?
 	if err == gocb.ErrKeyNotFound {
 		usr := structs.NewUser()
 		usr.Name = name
@@ -36,7 +39,40 @@ func ProcessMessage(bucket *gocb.Bucket, message []byte) *structs.Message {
 	}
 	structs.NewMessage(bucket, &msg)
 	StoreMessage(bucket, &msg)
+	TraverseAllParents(bucket, msg.Parent, &msg.Id)
 	return &msg
+}
+
+func TraverseAllParents(bucket *gocb.Bucket, parentId string, id *string) ([]string, error) {
+	var m  map[string]interface {}
+	_, err := bucket.Get(parentId, &m)
+	if err == gocb.ErrKeyNotFound {
+		log.Println("Parent not found")
+	} else {
+		switch t := m["type"]; t {
+		case "room":
+			log.Printf("found room %v\n", m["name"])
+			var users []string
+			for _, user := range m["users"].([]interface{}) {
+				users = append(users, user.(string))
+			}
+			return users, nil
+		default: // message
+			//log.Println(m)
+		    var msg structs.Message
+			_, err := bucket.Get(m["id"].(string), &msg)
+			if err != nil {
+				log.Print(err)
+			}
+			msg.Children = append(msg.Children, *id)
+			_, err = bucket.Upsert(msg.Id, msg, 0)
+			if err != nil {
+				log.Print(err)
+			}
+			return TraverseAllParents(bucket, m["parent"].(string), id)
+		}
+	}
+	return []string{}, errors.New("parent not found")
 }
 
 func ProcessLogin(message []byte) *structs.Login {
@@ -47,7 +83,6 @@ func ProcessLogin(message []byte) *structs.Login {
 	}
 	return &login
 }
-
 
 func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []structs.Message {
 	// todo sort
@@ -61,10 +96,20 @@ func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []st
 	var row structs.Message
 	var messages []structs.Message
 	for rows.Next(&row) {
+		r := structs.Message{}
+		deepcopy.Copy(&r, row)
 		messages = append(messages, row)
 	}
 	return messages
 }
+
+//func GetMessages(bucket *gocb.Bucket, room string) []structs.Message {
+//	var m  map[string]interface {}
+//	_, err := bucket.Get(parentId, &m)
+//	if err == gocb.ErrKeyNotFound {
+//		log.Println("Parent not found")
+//	} else
+//}
 
 func CreateSelfRoom(bucket *gocb.Bucket, username string) {
 	r := structs.NewRoom(bucket)

@@ -86,6 +86,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			case "history":
 				if logged {
 					rooms := yam.GetRooms(bucket, &conf, login.Login)
+					// todo all rooms
 					sendResponse(structs.History{
 						Messages: yam.ProcessHistory(bucket, &conf, rooms[0].Id),
 						Action:   "history",
@@ -125,10 +126,27 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Action: "rooms",
 				}, c, mt)
 				var messages []structs.Message
+				var children []string
 				for _, room := range rooms {
 					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
 						messages = append(messages, message)
+						for _, child := range message.Children {
+							children = append(children, child)
+						}
 					}
+				}
+				log.Println(children)
+				for _, child := range children {
+					var m structs.Message
+					_, err := bucket.Get(child, &m)
+					if err != nil {
+						log.Println("err getting child", err)
+					} else {
+						messages = append(messages, m)
+					}
+					//for _, message := range yam.GetMessages(bucket, &conf, child) {
+					//	messages = append(messages, message)
+					//}
 				}
 				sendResponse(structs.History{
 					Messages: messages,

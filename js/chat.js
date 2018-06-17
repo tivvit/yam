@@ -303,11 +303,15 @@ let App = React.createClass({
         // todo room has to be defined per message !!!
         // todo maybe children does not have to be in scopes
 
-        message.unread = true; // todo backend
-        if (message.children === undefined) {
-            message.children = [];
-            this.state.children[message.id] = message.children
-        }
+        // message.unread = true; // todo backend
+
+        message.children = [];
+        this.state.children[message.id] = message.children;
+        // if (message.children === undefined) {
+        //     message.children = [];
+        //     this.state.children[message.id] = message.children;
+        // }
+
         // todo it should never be undefined
         if (message.parent !== undefined) {
             // if (Object.keys(chat.state.rooms).includes(message.parent)) {
