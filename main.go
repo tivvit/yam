@@ -18,24 +18,29 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func closer(login *structs.Login, closed *bool) func(code int, text string) error {
+func closer(login *structs.Login, con *websocket.Conn) func(code int, text string) error {
 	return func(code int, text string) error {
 		if login != nil {
 			log.Printf("CLOSING! %v\n", login.Login)
+			var newConn []*websocket.Conn
+			for _, c := range connected[login.Login] {
+				if c != con {
+					newConn = append(newConn, c)
+				}
+			}
+			if len(newConn) == 0 {
+				delete(connected, login.Login)
+			}
 		} else {
 			log.Print("CLOSING! unknown")
 		}
-		// todo remove from connected
-		*closed = true
 		return nil
 	}
 }
 
 var bucket *gocb.Bucket
 var conf structs.Config
-var connected []string
-
-var _ map[string][]*websocket.Conn
+var connected map[string][]*websocket.Conn
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
@@ -45,7 +50,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 	logged := false
-	closed := false
 	var login *structs.Login
 	// todo goroutine ?
 	for {
@@ -76,6 +80,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					m := yam.ProcessMessage(bucket, msg)
 					//storage = append(storage, *m)
 					//log.Println(len(storage))
+					// todo send to appropriate users (notification)
 					sendResponse(m, c, mt)
 				}
 			case "history":
@@ -105,7 +110,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			case "login":
 				// todo add user to logged users
 				login = yam.ProcessLogin(msg)
-				connected = append(connected, login.Login)
+				connected[login.Login] = append(connected[login.Login], c)
 				log.Print("Logged: ", connected)
 				logged = true
 				rooms := yam.GetRooms(bucket, &conf, login.Login)
@@ -130,7 +135,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Action:   "history",
 				}, c, mt)
 				// todo store exact connection
-				c.SetCloseHandler(closer(login, &closed))
+				c.SetCloseHandler(closer(login, c))
 			default:
 				log.Printf("Unknown operation, ignororing %s %s", op.Operation, msg)
 			}
@@ -159,6 +164,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	connected = map[string][]*websocket.Conn{}
 	bucket = yam.GetCB(&conf)
 	http.HandleFunc("/", handler)
 	log.Printf("serving on %s\n", conf.Address)
