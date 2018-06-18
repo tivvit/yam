@@ -77,11 +77,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			switch op.Operation {
 			case "m": // message
 				if logged {
-					m := yam.ProcessMessage(bucket, msg)
+					m, users := yam.ProcessMessage(bucket, msg)
 					//storage = append(storage, *m)
 					//log.Println(len(storage))
-					// todo send to appropriate users (notification)
-					sendResponse(m, c, mt)
+					for _, user := range users {
+						if userCons, ok := connected[user]; ok {
+							for _, conn := range userCons {
+								sendResponse(m, conn, mt)
+							}
+						}
+					}
 				}
 			case "history":
 				if logged {

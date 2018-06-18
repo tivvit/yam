@@ -31,7 +31,7 @@ func StoreMessage(bucket *gocb.Bucket, m *structs.Message) {
 	}
 }
 
-func ProcessMessage(bucket *gocb.Bucket, message []byte) *structs.Message {
+func ProcessMessage(bucket *gocb.Bucket, message []byte) (*structs.Message, []string) {
 	msg := structs.Message{}
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
@@ -39,8 +39,11 @@ func ProcessMessage(bucket *gocb.Bucket, message []byte) *structs.Message {
 	}
 	structs.NewMessage(bucket, &msg)
 	StoreMessage(bucket, &msg)
-	TraverseAllParents(bucket, msg.Parent, &msg.Id)
-	return &msg
+	users, err := TraverseAllParents(bucket, msg.Parent, &msg.Id)
+	if err != nil {
+		log.Print(err)
+	}
+	return &msg, users
 }
 
 func TraverseAllParents(bucket *gocb.Bucket, parentId string, id *string) ([]string, error) {
