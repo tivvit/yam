@@ -10,7 +10,6 @@ import (
 	"github.com/tivvit/yam/structs"
 	"gopkg.in/couchbase/gocb.v1"
 	"github.com/tivvit/yam/yam"
-	"github.com/getlantern/deepcopy"
 )
 
 var upgrader = websocket.Upgrader{
