@@ -90,7 +90,7 @@ func ProcessLogin(message []byte) *structs.Login {
 func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []structs.Message {
 	// todo sort
 	// todo limit 10??!
-	query := gocb.NewN1qlQuery(fmt.Sprintf("SELECT `%s`.* FROM `%s` WHERE $1 = parent LIMIT 10",
+	query := gocb.NewN1qlQuery(fmt.Sprintf("SELECT `%s`.* FROM `%s` WHERE $1 = parent LIMIT 100",
 		conf.DbBucket, conf.DbBucket))
 	rows, err := bucket.ExecuteN1qlQuery(query, []interface{}{room})
 	if err != nil {
@@ -102,7 +102,7 @@ func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []st
 	for rows.Next(&row) {
 		r := structs.Message{}
 		deepcopy.Copy(&r, row)
-		messages = append(messages, row)
+		messages = append(messages, r)
 	}
 	return messages
 }

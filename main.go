@@ -131,6 +131,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					Action: "rooms",
 				}, c, mt)
 				var messages []structs.Message
+				// todo this should be set
 				var children []string
 				for _, room := range rooms {
 					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
