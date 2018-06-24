@@ -10,6 +10,7 @@ import (
 	"github.com/tivvit/yam/structs"
 	"gopkg.in/couchbase/gocb.v1"
 	"github.com/tivvit/yam/yam"
+	"github.com/getlantern/deepcopy"
 )
 
 var upgrader = websocket.Upgrader{
@@ -135,7 +136,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				var children []string
 				for _, room := range rooms {
 					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
-						messages = append(messages, message)
+						m := structs.Message{}
+						deepcopy.Copy(&m, message)
+						messages = append(messages, m)
 						for _, child := range message.Children {
 							children = append(children, child)
 						}
@@ -143,7 +146,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				}
 				log.Println(children)
 				for _, child := range children {
-					var m structs.Message
+					m := structs.Message{}
 					_, err := bucket.Get(child, &m)
 					if err != nil {
 						log.Println("err getting child", err)
