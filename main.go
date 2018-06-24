@@ -136,9 +136,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				var children []string
 				for _, room := range rooms {
 					for _, message := range yam.ProcessHistory(bucket, &conf, room.Id) {
-						m := structs.Message{}
-						deepcopy.Copy(&m, message)
-						messages = append(messages, m)
+						messages = append(messages, message)
 						for _, child := range message.Children {
 							children = append(children, child)
 						}

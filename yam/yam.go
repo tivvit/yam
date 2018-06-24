@@ -103,6 +103,7 @@ func ProcessHistory(bucket *gocb.Bucket, conf *structs.Config, room string) []st
 		r := structs.Message{}
 		deepcopy.Copy(&r, row)
 		messages = append(messages, r)
+		row = structs.Message{}
 	}
 	return messages
 }
