@@ -4,6 +4,7 @@ body {
   height: 100%;
   position: absolute;
   width: 100%;
+  font-family: "Open Sans", sans-serif;
 }
 
 #yam, #yamWrap {
@@ -135,4 +136,4 @@ body {
   padding: 2em;
 }
 
-/*# sourceMappingURL=css/style.css.map */
+/*# sourceMappingURL=style.css.map */
